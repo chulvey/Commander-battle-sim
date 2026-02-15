@@ -141,20 +141,25 @@ select, input {
     grid-template-columns: 1fr 1fr;
   }
 }
-</style>
 
-<style>
-input[type="number"] {
-    font-size:48px !important;
-    font-weight:bold;
-    text-align:right !important;
-    width:90px !important;
+/* Life prominence */
+.parity-row.life-row{
+  grid-template-columns: 1fr 90px;
+  margin-top:6px;
 }
-.seat {
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
+.parity-row.life-row span{
+  font-weight:700;
 }
+.parity-row.life-row input[id^="life"]{
+  width:90px;
+  font-size:48px;
+  font-weight:800;
+  text-align:right;
+  line-height:1;
+  padding:2px 6px;
+  height:52px;
+}
+
 </style>
 </head>
 
@@ -240,7 +245,7 @@ function generateSeats(){
       <div class="parity-row"><span>Mana</span><input type="number" id="mana${i}" value="0" onchange="update()"></div>
       <div class="parity-row"><span>Cards</span><input type="number" id="cards${i}" value="0" onchange="update()"></div>
       <div class="parity-row"><span>Board</span><input type="number" id="board${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Life</span><input type="number" id="life${i}" value="40" onchange="update()"></div>
+      <div class="parity-row life-row"><span>Life</span><input type="number" id="life${i}" value="40" onchange="update()"></div>
 
       <div class="rank" id="rank${i}"></div>
     </div>`;
