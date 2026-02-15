@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commander Battle Simulation v1.2</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#0e0e0e;
+  color:#ffffff;
+}
+header {
+  text-align:center;
+  padding:20px;
+  border-bottom:1px solid #888;
+}
+.logo {
+  font-size:26px;
+  font-weight:bold;
+  color:#B4FF00;
+}
+.banner {
+  margin-top:10px;
+  padding:8px;
+  border:1px solid #888;
+  color:#aaa;
+}
+button {
+  background:#B4FF00;
+  border:none;
+  padding:10px 16px;
+  margin:5px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.dashboard {
+  display:none;
+  padding:20px;
+}
+.pod {
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:20px;
+}
+.seat {
+  border:1px solid #888;
+  padding:15px;
+  background:#1a1a1a;
+  border-radius:6px;
+}
+.seat h3 {
+  margin-top:0;
+}
+.rank {
+  font-weight:bold;
+  margin-top:5px;
+}
+.high { color:#B4FF00; }
+.medium { color:yellow; }
+.low { color:#999; }
+
+.controls label {
+  display:block;
+  font-size:12px;
+  margin-top:6px;
+}
+select, input {
+  width:100%;
+  margin-top:2px;
+  background:#111;
+  color:white;
+  border:1px solid #555;
+}
+.parity-group {
+  display:flex;
+  gap:5px;
+}
+.parity-group input {
+  width:45px;
+}
+.compression, .threat-panel {
+  margin-top:20px;
+  padding:12px;
+  border:1px solid #888;
+  border-radius:6px;
+}
+.advanced {
+  margin-top:10px;
+  color:#aaa;
+  font-size:12px;
+}
+.footer {
+  text-align:center;
+  margin-top:30px;
+  padding:10px;
+  font-size:12px;
+  color:#777;
+}
+
+@media (max-width:768px){
+  .pod {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">YOUR BUSINESS LOGO</div>
+  <div class="banner">Advertising Banner Space</div>
+</header>
+
+<div style="text-align:center;">
+  <button onclick="startSimulation()">Begin Commander Battle Simulation</button>
+</div>
+
+<div class="dashboard" id="dashboard">
+
+<div class="pod" id="pod"></div>
+
+<div class="compression" id="compressionDisplay">
+Compression Level: Low
+</div>
+
+<div class="threat-panel">
+<h3>Threat Priority</h3>
+<div id="ranking"></div>
+<div class="advanced" id="advancedScores" style="display:none;"></div>
+</div>
+
+<div style="text-align:center;">
+  <button onclick="toggleAdvanced()">Toggle Advanced Mode</button>
+  <button onclick="resetSimulation()">Reset</button>
+</div>
+
+</div>
+
+<div class="footer">
+Structural Ranking Based on Visible Inputs and Archetype Density.
+</div>
+
+<script>
+
+const archetypes = ["Aggro","Combo","Control","Midrange"];
+const clockValues = {Developing:0, Transitioning:4, Imminent:8};
+let advancedMode = false;
+
+function startSimulation(){
+  document.getElementById("dashboard").style.display="block";
+  generateSeats();
+}
+
+function generateSeats(){
+  const pod = document.getElementById("pod");
+  pod.innerHTML="";
+  for(let i=0;i<4;i++){
+    pod.innerHTML += `
+    <div class="seat" id="seat${i}">
+      <h3>Seat ${i+1}</h3>
+
+      <label>Archetype</label>
+      <select id="arch${i}" onchange="update()">
+        ${archetypes.map(a=>`<option>${a}</option>`).join("")}
+      </select>
+
+      <label>Posture</label>
+      <select id="posture${i}" onchange="update()">
+        <option>Aligned</option>
+        <option>Disrupted</option>
+      </select>
+
+      <label>Clock</label>
+      <select id="clock${i}" onchange="update()">
+        <option>Developing</option>
+        <option>Transitioning</option>
+        <option>Imminent</option>
+      </select>
+
+      <label>Mulligans (0–3)</label>
+      <select id="mull${i}" onchange="update()">
+        <option>0</option><option>1</option><option>2</option><option>3</option>
+      </select>
+
+      <label>Parity (Mana / Cards / Board / Life)</label>
+      <div class="parity-group">
+        <input type="number" id="mana${i}" value="0" onchange="update()">
+        <input type="number" id="cards${i}" value="0" onchange="update()">
+        <input type="number" id="board${i}" value="0" onchange="update()">
+        <input type="number" id="life${i}" value="0" onchange="update()">
+      </div>
+
+      <div class="rank" id="rank${i}"></div>
+
+    </div>`;
+  }
+  update();
+}
+
+function update(){
+
+  let scores=[];
+  let archCount={Aggro:0,Combo:0,Control:0,Midrange:0};
+
+  for(let i=0;i<4;i++){
+    archCount[document.getElementById(`arch${i}`).value]++;
+  }
+
+  let compressionLevel="Low";
+  let imminentCount=0;
+  let transitioningCount=0;
+
+  for(let i=0;i<4;i++){
+    if(document.getElementById(`clock${i}`).value==="Imminent") imminentCount++;
+    if(document.getElementById(`clock${i}`).value==="Transitioning") transitioningCount++;
+  }
+
+  if(imminentCount>=1 || transitioningCount>=2) compressionLevel="Medium";
+  if(imminentCount>=2) compressionLevel="High";
+
+  document.getElementById("compressionDisplay").innerText="Compression Level: "+compressionLevel;
+
+  let compressionMult = compressionLevel==="Low"?1:(compressionLevel==="Medium"?1.25:1.5);
+
+  for(let i=0;i<4;i++){
+    let parity =
+      (parseInt(document.getElementById(`mana${i}`).value||0)*3)+
+      (parseInt(document.getElementById(`cards${i}`).value||0)*3)+
+      (parseInt(document.getElementById(`board${i}`).value||0)*2)+
+      (parseInt(document.getElementById(`life${i}`).value||0)*1);
+
+    let mullPenalty = [0,2,4,7][parseInt(document.getElementById(`mull${i}`).value)];
+    parity -= mullPenalty;
+
+    let clock = clockValues[document.getElementById(`clock${i}`).value];
+    if(document.getElementById(`posture${i}`).value==="Disrupted"){
+      clock *=0.5;
+    }
+
+    let densityMod=0;
+    if(archCount.Aggro>=3 && document.getElementById(`arch${i}`).value==="Control") densityMod=-4;
+    if(archCount.Combo>=3 && document.getElementById(`arch${i}`).value==="Aggro") densityMod=-4;
+    if(archCount.Control>=3 && document.getElementById(`arch${i}`).value==="Combo") densityMod=-4;
+
+    let score = parity + densityMod + (clock*compressionMult);
+    scores.push({seat:i,score});
+  }
+
+  scores.sort((a,b)=>b.score-a.score);
+
+  for(let rank=0;rank<4;rank++){
+    let seat=scores[rank].seat;
+    let tier = rank===0?"high":(rank===3?"low":"medium");
+    document.getElementById(`rank${seat}`).innerHTML=
+      `Rank: ${rank+1} <span class="${tier}">(${tier.toUpperCase()})</span>`;
+  }
+
+  let rankingHTML="";
+  scores.forEach((s,i)=>{
+    rankingHTML+=`<div>${i+1}) Seat ${s.seat+1}</div>`;
+  });
+  document.getElementById("ranking").innerHTML=rankingHTML;
+
+  if(advancedMode){
+    document.getElementById("advancedScores").style.display="block";
+    document.getElementById("advancedScores").innerHTML=
+      scores.map(s=>`Seat ${s.seat+1}: ${s.score.toFixed(2)}`).join("<br>");
+  }else{
+    document.getElementById("advancedScores").style.display="none";
+  }
+}
+
+function toggleAdvanced(){
+  advancedMode=!advancedMode;
+  update();
+}
+
+function resetSimulation(){
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("pod").innerHTML="";
+}
+
+</script>
+
+</body>
+</html>
