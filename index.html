@@ -161,6 +161,42 @@ select, input {
 }
 
 </style>
+
+<style>
+/* --- Vertical Compression Adjustment --- */
+
+/* Reduce seat vertical footprint ~10% */
+.seat {
+    padding: 8px 10px !important;
+    margin-bottom: 8px !important;
+}
+
+.seat h3 {
+    margin: 4px 0 !important;
+}
+
+.seat select,
+.seat input {
+    margin: 2px 0 !important;
+}
+
+/* Slightly reduce metric spacing */
+.metric-group {
+    gap: 4px !important;
+}
+
+/* Reduce hero dragon image height 15% */
+.hero-image {
+    max-height: 70vh !important;
+    object-fit: contain;
+}
+
+/* Reduce hero button spacing */
+.hero button {
+    margin-top: 10px !important;
+}
+</style>
+
 </head>
 
 <body>
