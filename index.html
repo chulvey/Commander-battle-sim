@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Commander Battle Simulation v1.3</title>
+<title>Commander Battle Simulation v1.4</title>
 
 <style>
 body {
@@ -12,64 +12,77 @@ body {
   font-family: Arial, sans-serif;
   background:#0e0e0e;
   color:#ffffff;
+  padding-top:80px;
+  padding-bottom:45px;
 }
 
+/* Sticky Header */
 header {
-  text-align:center;
-  padding:15px;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  background:#111;
   border-bottom:1px solid #555;
+  text-align:center;
+  padding:10px 0;
+  z-index:1000;
 }
 
 .logo {
-  font-size:22px;
+  font-size:18px;
   font-weight:bold;
   color:#B4FF00;
 }
 
 .banner {
-  margin-top:6px;
-  padding:6px;
+  margin-top:4px;
+  padding:4px;
   border:1px solid #555;
   color:#aaa;
-  font-size:12px;
+  font-size:11px;
 }
 
+/* Buttons */
 button {
   background:#B4FF00;
   border:none;
-  padding:8px 14px;
+  padding:6px 12px;
   margin:6px;
   font-weight:bold;
   cursor:pointer;
+  font-size:12px;
 }
 
 .dashboard {
   display:none;
-  padding:12px;
+  padding:8px;
 }
 
 .pod {
   display:grid;
   grid-template-columns: repeat(2, 1fr);
-  gap:12px;
+  gap:8px;
 }
 
+/* Smaller Seat Panels */
 .seat {
   border:1px solid #555;
-  padding:10px;
+  padding:7px;
   background:#1a1a1a;
   border-radius:6px;
-  font-size:12px;
+  font-size:10px;
 }
 
 .seat h3 {
-  margin:0 0 6px 0;
-  font-size:14px;
+  margin:0 0 4px 0;
+  font-size:12px;
 }
 
 .rank {
   font-weight:bold;
-  margin-top:6px;
+  margin-top:4px;
+  font-size:11px;
 }
 
 .high { color:#B4FF00; }
@@ -78,33 +91,35 @@ button {
 
 .controls label {
   display:block;
-  font-size:10px;
-  margin-top:4px;
+  font-size:9px;
+  margin-top:3px;
   color:#aaa;
 }
 
 select, input {
   width:100%;
-  margin-top:2px;
+  margin-top:1px;
   background:#111;
   color:white;
   border:1px solid #444;
-  font-size:11px;
+  font-size:9px;
+  padding:2px;
 }
 
 .parity-row {
   display:grid;
-  grid-template-columns: 1fr 50px;
-  gap:4px;
+  grid-template-columns: 1fr 45px;
+  gap:3px;
   align-items:center;
-  margin-top:2px;
+  margin-top:1px;
 }
 
 .parity-row span {
-  font-size:10px;
+  font-size:9px;
   color:#aaa;
 }
 
+/* Sticky Compression Footer */
 .sticky-compression {
   position:fixed;
   bottom:0;
@@ -112,16 +127,17 @@ select, input {
   right:0;
   background:#111;
   border-top:1px solid #555;
-  padding:8px;
+  padding:6px;
   text-align:center;
-  font-size:12px;
+  font-size:11px;
+  z-index:1000;
 }
 
 .footer-note {
   text-align:center;
-  font-size:10px;
+  font-size:9px;
   color:#666;
-  margin-bottom:40px;
+  margin-top:8px;
 }
 
 @media (max-width:768px){
