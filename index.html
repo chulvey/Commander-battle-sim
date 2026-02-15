@@ -144,29 +144,18 @@ select, input {
 </style>
 
 <style>
-.life-large{
-    font-size:48px;
-    text-align:center;
-    margin:6px 0;
+input[type="number"] {
+    font-size:48px !important;
     font-weight:bold;
+    text-align:right !important;
+    width:90px !important;
 }
-.life-controls button,
-.infect-controls button,
-.cd-controls button{
-    padding:2px 6px;
-    margin:2px;
-}
-.player-name{
-    width:100%;
-    font-weight:bold;
-    margin-bottom:4px;
-}
-.section-divider{
-    margin:8px 0;
-    border-top:1px solid #333;
+.seat {
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
 }
 </style>
-
 </head>
 
 <body>
@@ -176,7 +165,12 @@ select, input {
   <div class="banner">Advertising Banner Space</div>
 </header>
 
-<div style="text-align:center;">
+
+    <div class="hero" id="hero" style="height:100vh;background:url('dragon_bg.jpg') center/cover no-repeat;display:flex;align-items:flex-start;justify-content:center;padding-top:40px;">
+        <button style="padding:14px 26px;font-size:16px;font-weight:bold;background:transparent;color:#baff66;border:2px solid #baff66;border-radius:6px;cursor:pointer;box-shadow:0 0 10px rgba(186,255,102,0.4);" onclick="startSimulation()">Begin Commander Battle Simulation</button>
+    </div>
+    <div style="text-align:center; display:none;" id="originalStart">
+    
   <button onclick="startSimulation()">Begin Commander Battle Simulation</button>
 </div>
 
@@ -196,7 +190,11 @@ Compression Level: Low
 const archetypes = ["Aggro","Combo","Control","Midrange"];
 const clockValues = {Developing:0, Transitioning:4, Imminent:8};
 
-function startSimulation(){
+
+    function startSimulation(){
+        document.getElementById("hero").style.display="none";
+        document.getElementById("originalStart").style.display="none";
+    
   document.getElementById("dashboard").style.display="block";
   generateSeats();
 }
@@ -213,8 +211,7 @@ function generateSeats(){
 
     pod.innerHTML += `
     <div class="seat">
-      <input class="player-name" value="Player " />
-    <div class="life-large" id="life_display_${i+1}</h3>
+      <h3>Seat ${i+1}</h3>
 
       <label>Archetype</label>
       <select id="arch${i}" onchange="update()">
@@ -245,32 +242,7 @@ function generateSeats(){
       <div class="parity-row"><span>Board</span><input type="number" id="board${i}" value="0" onchange="update()"></div>
       <div class="parity-row"><span>Life</span><input type="number" id="life${i}" value="40" onchange="update()"></div>
 
-      
-    <div class="section-divider"></div>
-    <div class="life-large" id="life_display_0">40</div>
-    <div class="life-controls">
-        <button onclick="adjustLife(0,-1)">-</button>
-        <button onclick="adjustLife(0,1)">+</button>
-    </div>
-    Infect: <span id="infect_0">0</span>
-    <div class="infect-controls">
-        <button onclick="adjustInfect(0,-1)">-</button>
-        <button onclick="adjustInfect(0,1)">+</button>
-    </div>
-    <details>
-        <summary>Commander Damage</summary>
-        vs P1 <span id="cd_0_1">0</span>
-        <button onclick="adjustCD(0,1,-1)">-</button>
-        <button onclick="adjustCD(0,1,1)">+</button><br>
-        vs P2 <span id="cd_0_2">0</span>
-        <button onclick="adjustCD(0,2,-1)">-</button>
-        <button onclick="adjustCD(0,2,1)">+</button><br>
-        vs P3 <span id="cd_0_3">0</span>
-        <button onclick="adjustCD(0,3,-1)">-</button>
-        <button onclick="adjustCD(0,3,1)">+</button>
-    </details>
-    <div class="rank"
-     id="rank${i}"></div>
+      <div class="rank" id="rank${i}"></div>
     </div>`;
   }
   update();
@@ -335,25 +307,6 @@ function update(){
   }
 }
 
-</script>
-
-
-<script>
-function adjustLife(id, delta){
-    let el = document.getElementById("life_display_"+id);
-    el.innerText = parseInt(el.innerText) + delta;
-    update(); // trigger original engine recalculation
-}
-
-function adjustInfect(id, delta){
-    let el = document.getElementById("infect_"+id);
-    el.innerText = Math.max(0, parseInt(el.innerText) + delta);
-}
-
-function adjustCD(id, opp, delta){
-    let el = document.getElementById("cd_"+id+"_"+opp);
-    el.innerText = Math.max(0, parseInt(el.innerText) + delta);
-}
 </script>
 
 </body>
