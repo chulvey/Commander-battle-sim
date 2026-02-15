@@ -6,30 +6,66 @@
 <title>Commander Battle Simulation</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#111;color:white;}
+body{margin:0;font-family:Arial;background:#0f0f0f;color:white;}
+
+/* HERO SCREEN */
 .hero{
     height:100vh;
     background:url('dragon_bg.jpg') center/cover no-repeat;
     display:flex;
-    align-items:center;
+    align-items:flex-end;
     justify-content:center;
+    padding-bottom:18vh;
 }
+
 .start-btn{
-    padding:18px 36px;
-    font-size:20px;
+    padding:14px 26px;
+    font-size:16px;
     font-weight:bold;
-    background:#baff66;
-    border:none;
+    background:transparent;
+    color:#baff66;
+    border:2px solid #baff66;
+    border-radius:6px;
     cursor:pointer;
+    box-shadow:0 0 10px rgba(186,255,102,0.4);
 }
-.tool{display:none;padding:20px;}
+
+/* TOOL SCREEN */
+.tool{
+    display:none;
+    padding:20px;
+    max-width:900px;
+    margin:auto;
+}
+
 .player{
-    background:#1c1c1c;
-    padding:15px;
-    margin-bottom:15px;
+    background:#1a1a1a;
+    padding:14px;
+    margin-bottom:14px;
     border-left:6px solid #333;
 }
-input,select{margin:4px;}
+
+.player.aggro{border-left-color:#ff3b3b;}
+.player.control{border-left-color:#00bfff;}
+.player.combo{border-left-color:#00cc44;}
+.player.midrange{border-left-color:#dddddd;}
+
+input,select{
+    margin:4px;
+    background:#111;
+    color:white;
+    border:1px solid #444;
+}
+
+button.update{
+    margin-top:10px;
+    padding:10px 18px;
+    background:#baff66;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+}
+
 .compression{
     position:fixed;
     bottom:0;
@@ -53,7 +89,7 @@ input,select{margin:4px;}
 <div class="tool" id="tool">
 <h2>Commander Battle Simulation</h2>
 <div id="players"></div>
-<button onclick="calculate()">Update</button>
+<button class="update" onclick="calculate()">Update</button>
 </div>
 
 <div class="compression" id="compressionBar">
@@ -76,7 +112,7 @@ function buildPlayers(){
         <div class="player">
             <strong>Player ${i}</strong><br>
             Archetype:
-            <select>
+            <select onchange="updateArchetype(this)">
                 <option>Aggro</option>
                 <option>Control</option>
                 <option>Combo</option>
@@ -94,6 +130,12 @@ function buildPlayers(){
             Life:<input type="number" value="40">
         </div>`;
     }
+}
+
+function updateArchetype(select){
+    const playerDiv = select.closest(".player");
+    playerDiv.classList.remove("aggro","control","combo","midrange");
+    playerDiv.classList.add(select.value.toLowerCase());
 }
 
 function calculate(){
@@ -115,10 +157,10 @@ function calculate(){
             bestIndex=i;
         }
 
-        p.style.borderLeft="6px solid #333";
+        p.style.boxShadow="none";
     });
 
-    players[bestIndex].style.borderLeft="6px solid #baff66";
+    players[bestIndex].style.boxShadow="0 0 15px rgba(186,255,102,0.6)";
     document.getElementById("compressionBar").innerText="Compression Level: Transitioning";
 }
 
