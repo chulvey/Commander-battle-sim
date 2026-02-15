@@ -2,297 +2,154 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Commander Battle Simulation v1.5</title>
+<title>Commander Battle Tool</title>
 
 <style>
-body {
-  margin:0;
-  font-family: Arial, sans-serif;
-  background:#0e0e0e;
-  color:#ffffff;
-  padding-top:80px;
-  padding-bottom:45px;
+body{margin:0;font-family:Arial;background:#0f0f0f;color:white;}
+.hero{
+    height:100vh;
+    background:url('dragon_bg.jpg') center/cover no-repeat;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding-top:40px;
 }
-
-header {
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  background:#111;
-  border-bottom:1px solid #555;
-  text-align:center;
-  padding:10px 0;
-  z-index:1000;
+.start-btn{
+    padding:14px 26px;
+    font-size:16px;
+    font-weight:bold;
+    background:transparent;
+    color:#baff66;
+    border:2px solid #baff66;
+    border-radius:6px;
+    cursor:pointer;
+    box-shadow:0 0 10px rgba(186,255,102,0.4);
 }
-
-.logo {
-  font-size:18px;
-  font-weight:bold;
-  color:#B4FF00;
+.tool{display:none;padding:15px;max-width:1000px;margin:auto;}
+.player{
+    background:#1a1a1a;
+    padding:14px;
+    margin-bottom:14px;
+    border-left:6px solid #333;
 }
-
-.banner {
-  margin-top:4px;
-  padding:4px;
-  border:1px solid #555;
-  color:#aaa;
-  font-size:11px;
+.player.glow{box-shadow:0 0 18px rgba(186,255,102,0.6);}
+.name-input{
+    font-size:16px;
+    font-weight:bold;
+    width:100%;
+    background:#111;
+    color:white;
+    border:1px solid #444;
+    padding:6px;
 }
-
-button {
-  background:#B4FF00;
-  border:none;
-  padding:6px 12px;
-  margin:6px;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:12px;
-}
-
-.dashboard {
-  display:none;
-  padding:8px;
-}
-
-.pod {
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:8px;
-}
-
-.seat {
-  border:1px solid #555;
-  padding:7px;
-  background:#1a1a1a;
-  border-radius:6px;
-  font-size:10px;
-}
-
-.seat h3 {
-  margin:0 0 4px 0;
-  font-size:12px;
-}
-
-.rank {
-  font-weight:bold;
-  margin-top:4px;
-  font-size:11px;
-}
-
-.high { color:#B4FF00; }
-.medium { color:yellow; }
-.low { color:#888; }
-
-.controls label {
-  display:block;
-  font-size:9px;
-  margin-top:3px;
-  color:#aaa;
-}
-
-select, input {
-  width:100%;
-  margin-top:1px;
-  background:#111;
-  color:white;
-  border:1px solid #444;
-  font-size:9px;
-  padding:2px;
-}
-
-.parity-row {
-  display:grid;
-  grid-template-columns: 1fr 45px;
-  gap:3px;
-  align-items:center;
-  margin-top:1px;
-}
-
-.parity-row span {
-  font-size:9px;
-  color:#aaa;
-}
-
-.sticky-compression {
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#111;
-  border-top:1px solid #555;
-  padding:6px;
-  text-align:center;
-  font-size:11px;
-  z-index:1000;
-}
-
-.footer-note {
-  text-align:center;
-  font-size:9px;
-  color:#666;
-  margin-top:8px;
-}
-
-@media (max-width:768px){
-  .pod {
-    grid-template-columns: 1fr 1fr;
-  }
+.life{font-size:64px;text-align:center;margin:10px 0;}
+.counter-row{text-align:center;margin-bottom:8px;}
+button.small{padding:4px 8px;margin:2px;background:#333;color:white;border:none;}
+button.update{margin-top:10px;padding:10px 18px;background:#baff66;border:none;font-weight:bold;cursor:pointer;}
+.collapsible{background:#222;padding:8px;margin-top:8px;}
+.compression{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#000;
+    color:#baff66;
+    padding:10px;
+    text-align:center;
+    font-weight:bold;
+    display:none;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="logo">YOUR BUSINESS LOGO</div>
-  <div class="banner">Advertising Banner Space</div>
-</header>
-
-
-    <div class="hero" id="hero" style="height:100vh;background:url('dragon_bg.jpg') center/cover no-repeat;display:flex;align-items:flex-start;justify-content:center;padding-top:40px;">
-        <button style="padding:14px 26px;font-size:16px;font-weight:bold;background:transparent;color:#baff66;border:2px solid #baff66;border-radius:6px;cursor:pointer;box-shadow:0 0 10px rgba(186,255,102,0.4);" onclick="startSimulation()">Begin Commander Battle Simulation</button>
-    </div>
-    <div style="text-align:center; display:none;" id="originalStart">
-    
-  <button onclick="startSimulation()">Begin Commander Battle Simulation</button>
+<div class="hero" id="hero">
+    <button class="start-btn" onclick="startTool()">Begin Commander Battle Simulation</button>
 </div>
 
-<div class="dashboard" id="dashboard">
-<div class="pod" id="pod"></div>
-<div class="footer-note">
-Structural Ranking Based on Visible Inputs and Archetype Density.
-</div>
+<div class="tool" id="tool">
+<h2>Commander Table Tool</h2>
+<div id="players"></div>
+<button class="update" onclick="calculateLeader()">Update Leader</button>
 </div>
 
-<div class="sticky-compression" id="compressionDisplay">
-Compression Level: Low
+<div class="compression" id="compressionBar">
+Compression Level: Developing
 </div>
 
 <script>
-
-const archetypes = ["Aggro","Combo","Control","Midrange"];
-const clockValues = {Developing:0, Transitioning:4, Imminent:8};
-
-
-    function startSimulation(){
-        document.getElementById("hero").style.display="none";
-        document.getElementById("originalStart").style.display="none";
-    
-  document.getElementById("dashboard").style.display="block";
-  generateSeats();
+function startTool(){
+    document.getElementById("hero").style.display="none";
+    document.getElementById("tool").style.display="block";
+    document.getElementById("compressionBar").style.display="block";
+    buildPlayers();
 }
 
-function generateSeats(){
-  const pod = document.getElementById("pod");
-  pod.innerHTML="";
-
-  // Clockwise layout order
-  const layoutOrder = [0,1,3,2];
-
-  for(let index=0; index<layoutOrder.length; index++){
-    let i = layoutOrder[index];
-
-    pod.innerHTML += `
-    <div class="seat">
-      <h3>Seat ${i+1}</h3>
-
-      <label>Archetype</label>
-      <select id="arch${i}" onchange="update()">
-        ${archetypes.map(a=>`<option>${a}</option>`).join("")}
-      </select>
-
-      <label>Posture</label>
-      <select id="posture${i}" onchange="update()">
-        <option>Aligned</option>
-        <option>Disrupted</option>
-      </select>
-
-      <label>Clock</label>
-      <select id="clock${i}" onchange="update()">
-        <option>Developing</option>
-        <option>Transitioning</option>
-        <option>Imminent</option>
-      </select>
-
-      <label>Mulligans</label>
-      <select id="mull${i}" onchange="update()">
-        <option>0</option><option>1</option><option>2</option><option>3</option>
-      </select>
-
-      <label>Parity</label>
-      <div class="parity-row"><span>Mana</span><input type="number" id="mana${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Cards</span><input type="number" id="cards${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Board</span><input type="number" id="board${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Life</span><input type="number" id="life${i}" value="40" onchange="update()"></div>
-
-      <div class="rank" id="rank${i}"></div>
-    </div>`;
-  }
-  update();
-}
-
-function update(){
-
-  let scores=[];
-  let archCount={Aggro:0,Combo:0,Control:0,Midrange:0};
-
-  for(let i=0;i<4;i++){
-    archCount[document.getElementById(`arch${i}`).value]++;
-  }
-
-  let compressionLevel="Low";
-  let imminentCount=0;
-  let transitioningCount=0;
-
-  for(let i=0;i<4;i++){
-    if(document.getElementById(`clock${i}`).value==="Imminent") imminentCount++;
-    if(document.getElementById(`clock${i}`).value==="Transitioning") transitioningCount++;
-  }
-
-  if(imminentCount>=1 || transitioningCount>=2) compressionLevel="Medium";
-  if(imminentCount>=2) compressionLevel="High";
-
-  document.getElementById("compressionDisplay").innerText="Compression Level: "+compressionLevel;
-
-  let compressionMult = compressionLevel==="Low"?1:(compressionLevel==="Medium"?1.25:1.5);
-
-  for(let i=0;i<4;i++){
-    let parity =
-      (parseInt(document.getElementById(`mana${i}`).value||0)*3)+
-      (parseInt(document.getElementById(`cards${i}`).value||0)*3)+
-      (parseInt(document.getElementById(`board${i}`).value||0)*2)+
-      ((parseInt(document.getElementById(`life${i}`).value||40)-40)*1);
-
-    let mullPenalty = [0,2,4,7][parseInt(document.getElementById(`mull${i}`).value)];
-    parity -= mullPenalty;
-
-    let clock = clockValues[document.getElementById(`clock${i}`).value];
-    if(document.getElementById(`posture${i}`).value==="Disrupted"){
-      clock *=0.5;
+function buildPlayers(){
+    const container=document.getElementById("players");
+    for(let i=1;i<=4;i++){
+        container.innerHTML += `
+        <div class="player">
+            <input class="name-input" value="Player ${i}">
+            <div class="life" id="life${i}">40</div>
+            <div class="counter-row">
+                <button class="small" onclick="changeLife(${i}, -1)">-</button>
+                <button class="small" onclick="changeLife(${i}, 1)">+</button>
+            </div>
+            Infect: <span id="infect${i}">0</span>
+            <div class="counter-row">
+                <button class="small" onclick="changeInfect(${i}, -1)">-</button>
+                <button class="small" onclick="changeInfect(${i}, 1)">+</button>
+            </div>
+            <details class="collapsible">
+                <summary>Commander Damage</summary>
+                vs P1: <span id="cd${i}_1">0</span>
+                <button class="small" onclick="changeCD(${i},1,-1)">-</button>
+                <button class="small" onclick="changeCD(${i},1,1)">+</button><br>
+                vs P2: <span id="cd${i}_2">0</span>
+                <button class="small" onclick="changeCD(${i},2,-1)">-</button>
+                <button class="small" onclick="changeCD(${i},2,1)">+</button><br>
+                vs P3: <span id="cd${i}_3">0</span>
+                <button class="small" onclick="changeCD(${i},3,-1)">-</button>
+                <button class="small" onclick="changeCD(${i},3,1)">+</button>
+            </details>
+        </div>`;
     }
-
-    let densityMod=0;
-    if(archCount.Aggro>=3 && document.getElementById(`arch${i}`).value==="Control") densityMod=-4;
-    if(archCount.Combo>=3 && document.getElementById(`arch${i}`).value==="Aggro") densityMod=-4;
-    if(archCount.Control>=3 && document.getElementById(`arch${i}`).value==="Combo") densityMod=-4;
-
-    let score = parity + densityMod + (clock*compressionMult);
-    scores.push({seat:i,score});
-  }
-
-  scores.sort((a,b)=>b.score-a.score);
-
-  for(let rank=0;rank<4;rank++){
-    let seat=scores[rank].seat;
-    let tier = rank===0?"high":(rank===3?"low":"medium");
-    document.getElementById(`rank${seat}`).innerHTML=
-      `Rank: ${rank+1} <span class="${tier}">(${tier.toUpperCase()})</span>`;
-  }
 }
 
+function changeLife(p, delta){
+    let el=document.getElementById("life"+p);
+    el.innerText=parseInt(el.innerText)+delta;
+}
+
+function changeInfect(p, delta){
+    let el=document.getElementById("infect"+p);
+    el.innerText=Math.max(0,parseInt(el.innerText)+delta);
+}
+
+function changeCD(p, opp, delta){
+    let el=document.getElementById("cd"+p+"_"+opp);
+    el.innerText=Math.max(0,parseInt(el.innerText)+delta);
+}
+
+function calculateLeader(){
+    const players=document.querySelectorAll(".player");
+    let bestLife=-999;
+    let bestIndex=0;
+
+    players.forEach((p,i)=>{
+        let life=parseInt(document.getElementById("life"+(i+1)).innerText);
+        if(life>bestLife){
+            bestLife=life;
+            bestIndex=i;
+        }
+        p.classList.remove("glow");
+    });
+
+    players[bestIndex].classList.add("glow");
+    document.getElementById("compressionBar").innerText="Compression Level: Live Play Mode";
+}
 </script>
 
 </body>
