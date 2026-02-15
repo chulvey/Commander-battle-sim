@@ -4,344 +4,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Commander Battle Simulation v1.8</title>
+<title>Commander Battle Simulation - Final Draft</title>
 
 <style>
 body {
   margin:0;
   font-family: Arial, sans-serif;
-  background:#0d0d0d;
-  color:#ffffff;
-  padding-top:120px;
-  padding-bottom:50px;
-}
-
-header {
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  background:#111;
-  border-bottom:1px solid #333;
-  text-align:center;
-  padding:8px 0 6px 0;
-  z-index:1000;
-}
-
-.logo {
-  font-size:18px;
-  font-weight:bold;
-}
-
-.banner {
-  margin-top:4px;
-  padding:4px;
-  border:1px solid #333;
-  color:#aaa;
-  font-size:11px;
-}
-
-.color-key {
-  display:flex;
-  justify-content:center;
-  gap:14px;
-  margin-top:6px;
-  font-size:10px;
-}
-
-.key-item {
-  display:flex;
-  align-items:center;
-  gap:4px;
-}
-
-.dot {
-  width:8px;
-  height:8px;
-  border-radius:50%;
-}
-
-.red { background:#ff3b3b; }
-.green { background:#00cc44; }
-.blue { background:#00bfff; }
-.white { background:#dddddd; }
-
-/* Exploit Triangle */
-.triangle-container {
-  text-align:center;
-  margin-top:20px;
-  cursor:pointer;
-}
-
-.triangle-svg {
-  width:260px;
-  max-width:90%;
-}
-
-.triangle-label {
-  font-size:12px;
-  font-weight:bold;
-}
-
-.dashboard { display:none; padding:8px; }
-
-.pod {
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:8px;
-}
-
-.seat {
-  border:1px solid #333;
-  padding:8px;
-  background:#161616;
-  border-radius:8px;
-  font-size:10px;
-  position:relative;
-  transition:all 0.2s ease;
-}
-
-.seat.glow {
-  box-shadow:0 0 12px #ffffff;
-}
-
-.rank {
-  font-weight:bold;
-  margin-top:4px;
-  font-size:11px;
-}
-
-select, input {
-  width:100%;
-  margin-top:2px;
-  background:#0f0f0f;
+  background:black;
   color:white;
-  border:1px solid #333;
-  font-size:9px;
-  padding:2px;
 }
 
-.parity-row {
-  display:grid;
-  grid-template-columns: 1fr 45px;
-  gap:3px;
+.hero {
+  position:relative;
+  height:100vh;
+  background-image:url('dragon_bg.jpg');
+  background-size:cover;
+  background-position:center;
+  display:flex;
   align-items:center;
-  margin-top:1px;
+  justify-content:center;
+  overflow:hidden;
 }
 
-.clock-ring {
+.overlay-ring {
   position:absolute;
-  top:6px;
-  right:6px;
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  border:2px solid #444;
+  width:60vmin;
+  height:60vmin;
 }
 
-.clock-dev { border-color:#444; }
-.clock-trans { border-color:#00cc44; }
-.clock-imm { border-color:#ff3b3b; }
-
-.sticky-compression {
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#111;
-  border-top:1px solid #333;
-  padding:6px;
-  text-align:center;
-  font-size:11px;
+svg {
+  width:100%;
+  height:100%;
 }
 
-button {
-  background:#ffffff;
+.rotating-ring {
+  animation: rotateCCW 60s linear infinite;
+  transform-origin:50% 50%;
+}
+
+@keyframes rotateCCW {
+  from { transform:rotate(0deg); }
+  to { transform:rotate(-360deg); }
+}
+
+.arrow-path {
+  fill:none;
+  stroke:#baff66;
+  stroke-width:5;
+  stroke-linecap:round;
+  filter: drop-shadow(0 0 6px #baff66);
+}
+
+.arrow-head {
+  fill:#baff66;
+}
+
+.start-button {
+  position:absolute;
+  bottom:60px;
+  padding:16px 32px;
+  font-size:18px;
+  background:#baff66;
   border:none;
-  padding:6px 12px;
-  margin:10px;
   font-weight:bold;
   cursor:pointer;
-  font-size:12px;
 }
+
+.dashboard {
+  display:none;
+  min-height:100vh;
+  background-image:url('dragon_bg.jpg');
+  background-size:cover;
+  background-position:center;
+  padding:40px;
+}
+
+.panel {
+  background:rgba(0,0,0,0.8);
+  padding:20px;
+  border:1px solid #baff66;
+}
+
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="logo">YOUR BUSINESS LOGO</div>
-  <div class="banner">Advertising Banner Space</div>
-  <div class="color-key">
-    <div class="key-item"><div class="dot red"></div>Aggro</div>
-    <div class="key-item"><div class="dot green"></div>Combo</div>
-    <div class="key-item"><div class="dot blue"></div>Control</div>
-    <div class="key-item"><div class="dot white"></div>Midrange</div>
+<div class="hero" id="hero">
+
+  <div class="overlay-ring">
+    <svg viewBox="0 0 500 500">
+      <g class="rotating-ring">
+
+        <path class="arrow-path" d="M250 40 A210 210 0 0 0 70 340"/>
+        <path class="arrow-path" d="M70 340 A210 210 0 0 0 430 340"/>
+        <path class="arrow-path" d="M430 340 A210 210 0 0 0 250 40"/>
+
+        <polygon class="arrow-head" points="250,40 235,65 265,65"/>
+        <polygon class="arrow-head" points="70,340 95,325 95,355"/>
+        <polygon class="arrow-head" points="430,340 405,355 405,325"/>
+
+      </g>
+    </svg>
   </div>
-</header>
 
-<!-- Exploit Triangle -->
-<div class="triangle-container" onclick="startSimulation()">
-  <svg viewBox="0 0 200 200" class="triangle-svg">
-    <polygon points="100,20 20,160 180,160" fill="none" stroke="#888" stroke-width="2"/>
-    
-    <!-- Aggro -->
-    <circle cx="100" cy="20" r="12" fill="#ff3b3b"/>
-    <text x="100" y="18" text-anchor="middle" fill="white" font-size="10">Aggro</text>
-    
-    <!-- Control -->
-    <circle cx="20" cy="160" r="12" fill="#00bfff"/>
-    <text x="20" y="165" text-anchor="middle" fill="white" font-size="10">Control</text>
-    
-    <!-- Combo -->
-    <circle cx="180" cy="160" r="12" fill="#00cc44"/>
-    <text x="180" y="165" text-anchor="middle" fill="black" font-size="10">Combo</text>
-    
-    <!-- Midrange Center -->
-    <circle cx="100" cy="115" r="10" fill="#dddddd"/>
-    <text x="100" y="118" text-anchor="middle" fill="black" font-size="9">Mid</text>
-  </svg>
-  <div class="triangle-label">Tap Triangle to Begin Simulation</div>
-</div>
+  <button class="start-button" onclick="startEngine()">
+    Begin Commander Battle Simulation
+  </button>
 
-<div style="text-align:center;">
-  <button onclick="startSimulation()">Begin Commander Battle Simulation</button>
 </div>
 
 <div class="dashboard" id="dashboard">
-<div class="pod" id="pod"></div>
-</div>
-
-<div class="sticky-compression" id="compressionDisplay">
-Compression Level: Low
+  <div class="panel">
+    <h2>Commander Battle Simulation</h2>
+    <p>Tool Interface Placeholder (your existing seat logic integrates here)</p>
+  </div>
 </div>
 
 <script>
-
-const archetypes = ["Aggro","Combo","Control","Midrange"];
-const clockValues = {Developing:0, Transitioning:4, Imminent:8};
-
-function startSimulation(){
-  document.querySelector(".triangle-container").style.display="none";
-  document.querySelector("button").style.display="none";
+function startEngine(){
+  document.getElementById("hero").style.display="none";
   document.getElementById("dashboard").style.display="block";
-  generateSeats();
 }
-
-function generateSeats(){
-  const pod = document.getElementById("pod");
-  pod.innerHTML="";
-  const layoutOrder = [0,1,3,2];
-
-  for(let index=0; index<layoutOrder.length; index++){
-    let i = layoutOrder[index];
-
-    pod.innerHTML += `
-    <div class="seat" id="seat${i}">
-      <div class="clock-ring clock-dev" id="clockRing${i}"></div>
-      <h3>Seat ${i+1}</h3>
-
-      <select id="arch${i}" onchange="update()">
-        ${archetypes.map(a=>`<option>${a}</option>`).join("")}
-      </select>
-
-      <select id="posture${i}" onchange="update()">
-        <option>Aligned</option>
-        <option>Disrupted</option>
-      </select>
-
-      <select id="clock${i}" onchange="update()">
-        <option>Developing</option>
-        <option>Transitioning</option>
-        <option>Imminent</option>
-      </select>
-
-      <label>Mulligans Taken</label>
-      <select id="mull${i}" onchange="update()">
-        <option>0</option><option>1</option><option>2</option><option>3</option>
-      </select>
-
-      <div class="parity-row"><span>Mana</span><input type="number" id="mana${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Cards</span><input type="number" id="cards${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Board</span><input type="number" id="board${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Life</span><input type="number" id="life${i}" value="40" onchange="update()"></div>
-
-      <div class="rank" id="rank${i}"></div>
-    </div>`;
-  }
-  update();
-}
-
-function update(){
-
-  let scores=[];
-  let archCount={Aggro:0,Combo:0,Control:0,Midrange:0};
-
-  for(let i=0;i<4;i++){
-    archCount[document.getElementById(`arch${i}`).value]++;
-  }
-
-  let compressionLevel="Low";
-  let imminentCount=0;
-  let transitioningCount=0;
-
-  for(let i=0;i<4;i++){
-    if(document.getElementById(`clock${i}`).value==="Imminent") imminentCount++;
-    if(document.getElementById(`clock${i}`).value==="Transitioning") transitioningCount++;
-  }
-
-  if(imminentCount>=1 || transitioningCount>=2) compressionLevel="Medium";
-  if(imminentCount>=2) compressionLevel="High";
-
-  document.getElementById("compressionDisplay").innerText="Compression Level: "+compressionLevel;
-
-  let compressionMult = compressionLevel==="Low"?1:(compressionLevel==="Medium"?1.25:1.5);
-
-  for(let i=0;i<4;i++){
-    let seat = document.getElementById(`seat${i}`);
-    seat.classList.remove("glow");
-
-    let parity =
-      (parseInt(document.getElementById(`mana${i}`).value||0)*3)+
-      (parseInt(document.getElementById(`cards${i}`).value||0)*3)+
-      (parseInt(document.getElementById(`board${i}`).value||0)*2)+
-      ((parseInt(document.getElementById(`life${i}`).value||40)-40)*1);
-
-    let mullPenalty = [0,2,4,7][parseInt(document.getElementById(`mull${i}`).value)];
-    parity -= mullPenalty;
-
-    let clock = clockValues[document.getElementById(`clock${i}`).value];
-    if(document.getElementById(`posture${i}`).value==="Disrupted"){
-      clock *=0.5;
-    }
-
-    let ring = document.getElementById(`clockRing${i}`);
-    ring.className = "clock-ring";
-    if(clock===0) ring.classList.add("clock-dev");
-    if(clock===4) ring.classList.add("clock-trans");
-    if(clock>=8) ring.classList.add("clock-imm");
-
-    let densityMod=0;
-    if(archCount.Aggro>=3 && document.getElementById(`arch${i}`).value==="Control") densityMod=-4;
-    if(archCount.Combo>=3 && document.getElementById(`arch${i}`).value==="Aggro") densityMod=-4;
-    if(archCount.Control>=3 && document.getElementById(`arch${i}`).value==="Combo") densityMod=-4;
-
-    let score = parity + densityMod + (clock*compressionMult);
-    scores.push({seat:i,score});
-  }
-
-  scores.sort((a,b)=>b.score-a.score);
-
-  for(let rank=0;rank<4;rank++){
-    let seatIndex=scores[rank].seat;
-    document.getElementById(`rank${seatIndex}`).innerHTML=
-      `Rank: ${rank+1}`;
-    if(rank===0){
-      document.getElementById(`seat${seatIndex}`).classList.add("glow");
-    }
-  }
-}
-
 </script>
 
 </body>
