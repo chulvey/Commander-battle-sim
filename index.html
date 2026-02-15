@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Commander Battle Simulation v1.6</title>
+<title>Commander Battle Simulation v1.8</title>
 
 <style>
 body {
@@ -12,7 +12,7 @@ body {
   font-family: Arial, sans-serif;
   background:#0d0d0d;
   color:#ffffff;
-  padding-top:80px;
+  padding-top:120px;
   padding-bottom:50px;
 }
 
@@ -24,15 +24,13 @@ header {
   background:#111;
   border-bottom:1px solid #333;
   text-align:center;
-  padding:10px 0;
+  padding:8px 0 6px 0;
   z-index:1000;
 }
 
 .logo {
   font-size:18px;
   font-weight:bold;
-  color:#B4FF00;
-  letter-spacing:1px;
 }
 
 .banner {
@@ -41,6 +39,48 @@ header {
   border:1px solid #333;
   color:#aaa;
   font-size:11px;
+}
+
+.color-key {
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  margin-top:6px;
+  font-size:10px;
+}
+
+.key-item {
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+}
+
+.red { background:#ff3b3b; }
+.green { background:#00cc44; }
+.blue { background:#00bfff; }
+.white { background:#dddddd; }
+
+/* Exploit Triangle */
+.triangle-container {
+  text-align:center;
+  margin-top:20px;
+  cursor:pointer;
+}
+
+.triangle-svg {
+  width:260px;
+  max-width:90%;
+}
+
+.triangle-label {
+  font-size:12px;
+  font-weight:bold;
 }
 
 .dashboard { display:none; padding:8px; }
@@ -62,29 +102,14 @@ header {
 }
 
 .seat.glow {
-  box-shadow:0 0 12px #B4FF00;
+  box-shadow:0 0 12px #ffffff;
 }
-
-.seat h3 {
-  margin:0 0 4px 0;
-  font-size:12px;
-}
-
-/* Archetype Accent Borders */
-.aggro { border-left:4px solid #B4FF00; }
-.combo { border-left:4px solid #FFD700; }
-.control { border-left:4px solid #00BFFF; }
-.midrange { border-left:4px solid #CCCCCC; }
 
 .rank {
   font-weight:bold;
   margin-top:4px;
   font-size:11px;
 }
-
-.high { color:#B4FF00; }
-.medium { color:#FFD700; }
-.low { color:#777; }
 
 select, input {
   width:100%;
@@ -104,12 +129,6 @@ select, input {
   margin-top:1px;
 }
 
-.parity-row span {
-  font-size:9px;
-  color:#aaa;
-}
-
-/* Clock Indicator */
 .clock-ring {
   position:absolute;
   top:6px;
@@ -121,8 +140,8 @@ select, input {
 }
 
 .clock-dev { border-color:#444; }
-.clock-trans { border-color:#B4FF00; }
-.clock-imm { border-color:#FFD700; }
+.clock-trans { border-color:#00cc44; }
+.clock-imm { border-color:#ff3b3b; }
 
 .sticky-compression {
   position:fixed;
@@ -136,18 +155,11 @@ select, input {
   font-size:11px;
 }
 
-.footer-note {
-  text-align:center;
-  font-size:9px;
-  color:#666;
-  margin-top:6px;
-}
-
 button {
-  background:#B4FF00;
+  background:#ffffff;
   border:none;
   padding:6px 12px;
-  margin:6px;
+  margin:10px;
   font-weight:bold;
   cursor:pointer;
   font-size:12px;
@@ -160,7 +172,37 @@ button {
 <header>
   <div class="logo">YOUR BUSINESS LOGO</div>
   <div class="banner">Advertising Banner Space</div>
+  <div class="color-key">
+    <div class="key-item"><div class="dot red"></div>Aggro</div>
+    <div class="key-item"><div class="dot green"></div>Combo</div>
+    <div class="key-item"><div class="dot blue"></div>Control</div>
+    <div class="key-item"><div class="dot white"></div>Midrange</div>
+  </div>
 </header>
+
+<!-- Exploit Triangle -->
+<div class="triangle-container" onclick="startSimulation()">
+  <svg viewBox="0 0 200 200" class="triangle-svg">
+    <polygon points="100,20 20,160 180,160" fill="none" stroke="#888" stroke-width="2"/>
+    
+    <!-- Aggro -->
+    <circle cx="100" cy="20" r="12" fill="#ff3b3b"/>
+    <text x="100" y="18" text-anchor="middle" fill="white" font-size="10">Aggro</text>
+    
+    <!-- Control -->
+    <circle cx="20" cy="160" r="12" fill="#00bfff"/>
+    <text x="20" y="165" text-anchor="middle" fill="white" font-size="10">Control</text>
+    
+    <!-- Combo -->
+    <circle cx="180" cy="160" r="12" fill="#00cc44"/>
+    <text x="180" y="165" text-anchor="middle" fill="black" font-size="10">Combo</text>
+    
+    <!-- Midrange Center -->
+    <circle cx="100" cy="115" r="10" fill="#dddddd"/>
+    <text x="100" y="118" text-anchor="middle" fill="black" font-size="9">Mid</text>
+  </svg>
+  <div class="triangle-label">Tap Triangle to Begin Simulation</div>
+</div>
 
 <div style="text-align:center;">
   <button onclick="startSimulation()">Begin Commander Battle Simulation</button>
@@ -168,7 +210,6 @@ button {
 
 <div class="dashboard" id="dashboard">
 <div class="pod" id="pod"></div>
-<div class="footer-note">Structural Ranking Based on Visible Inputs.</div>
 </div>
 
 <div class="sticky-compression" id="compressionDisplay">
@@ -181,6 +222,8 @@ const archetypes = ["Aggro","Combo","Control","Midrange"];
 const clockValues = {Developing:0, Transitioning:4, Imminent:8};
 
 function startSimulation(){
+  document.querySelector(".triangle-container").style.display="none";
+  document.querySelector("button").style.display="none";
   document.getElementById("dashboard").style.display="block";
   generateSeats();
 }
@@ -213,6 +256,7 @@ function generateSeats(){
         <option>Imminent</option>
       </select>
 
+      <label>Mulligans Taken</label>
       <select id="mull${i}" onchange="update()">
         <option>0</option><option>1</option><option>2</option><option>3</option>
       </select>
@@ -255,10 +299,7 @@ function update(){
 
   for(let i=0;i<4;i++){
     let seat = document.getElementById(`seat${i}`);
-    seat.classList.remove("aggro","combo","control","midrange","glow");
-
-    let arch = document.getElementById(`arch${i}`).value;
-    seat.classList.add(arch.toLowerCase());
+    seat.classList.remove("glow");
 
     let parity =
       (parseInt(document.getElementById(`mana${i}`).value||0)*3)+
@@ -281,9 +322,9 @@ function update(){
     if(clock>=8) ring.classList.add("clock-imm");
 
     let densityMod=0;
-    if(archCount.Aggro>=3 && arch==="Control") densityMod=-4;
-    if(archCount.Combo>=3 && arch==="Aggro") densityMod=-4;
-    if(archCount.Control>=3 && arch==="Combo") densityMod=-4;
+    if(archCount.Aggro>=3 && document.getElementById(`arch${i}`).value==="Control") densityMod=-4;
+    if(archCount.Combo>=3 && document.getElementById(`arch${i}`).value==="Aggro") densityMod=-4;
+    if(archCount.Control>=3 && document.getElementById(`arch${i}`).value==="Combo") densityMod=-4;
 
     let score = parity + densityMod + (clock*compressionMult);
     scores.push({seat:i,score});
@@ -293,9 +334,8 @@ function update(){
 
   for(let rank=0;rank<4;rank++){
     let seatIndex=scores[rank].seat;
-    let tier = rank===0?"high":(rank===3?"low":"medium");
     document.getElementById(`rank${seatIndex}`).innerHTML=
-      `Rank: ${rank+1} <span class="${tier}">(${tier.toUpperCase()})</span>`;
+      `Rank: ${rank+1}`;
     if(rank===0){
       document.getElementById(`seat${seatIndex}`).classList.add("glow");
     }
