@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Commander Battle Simulation v1.4</title>
+<title>Commander Battle Simulation v1.5</title>
 
 <style>
 body {
@@ -16,7 +16,6 @@ body {
   padding-bottom:45px;
 }
 
-/* Sticky Header */
 header {
   position:fixed;
   top:0;
@@ -43,7 +42,6 @@ header {
   font-size:11px;
 }
 
-/* Buttons */
 button {
   background:#B4FF00;
   border:none;
@@ -65,7 +63,6 @@ button {
   gap:8px;
 }
 
-/* Smaller Seat Panels */
 .seat {
   border:1px solid #555;
   padding:7px;
@@ -119,7 +116,6 @@ select, input {
   color:#aaa;
 }
 
-/* Sticky Compression Footer */
 .sticky-compression {
   position:fixed;
   bottom:0;
@@ -183,7 +179,13 @@ function startSimulation(){
 function generateSeats(){
   const pod = document.getElementById("pod");
   pod.innerHTML="";
-  for(let i=0;i<4;i++){
+
+  // Clockwise layout order
+  const layoutOrder = [0,1,3,2];
+
+  for(let index=0; index<layoutOrder.length; index++){
+    let i = layoutOrder[index];
+
     pod.innerHTML += `
     <div class="seat">
       <h3>Seat ${i+1}</h3>
