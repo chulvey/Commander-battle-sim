@@ -4,16 +4,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Commander Battle Simulation v1.5</title>
+<title>Commander Battle Simulation v1.6</title>
 
 <style>
 body {
   margin:0;
   font-family: Arial, sans-serif;
-  background:#0e0e0e;
+  background:#0d0d0d;
   color:#ffffff;
   padding-top:80px;
-  padding-bottom:45px;
+  padding-bottom:50px;
 }
 
 header {
@@ -22,7 +22,7 @@ header {
   left:0;
   right:0;
   background:#111;
-  border-bottom:1px solid #555;
+  border-bottom:1px solid #333;
   text-align:center;
   padding:10px 0;
   z-index:1000;
@@ -32,30 +32,18 @@ header {
   font-size:18px;
   font-weight:bold;
   color:#B4FF00;
+  letter-spacing:1px;
 }
 
 .banner {
   margin-top:4px;
   padding:4px;
-  border:1px solid #555;
+  border:1px solid #333;
   color:#aaa;
   font-size:11px;
 }
 
-button {
-  background:#B4FF00;
-  border:none;
-  padding:6px 12px;
-  margin:6px;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:12px;
-}
-
-.dashboard {
-  display:none;
-  padding:8px;
-}
+.dashboard { display:none; padding:8px; }
 
 .pod {
   display:grid;
@@ -64,17 +52,29 @@ button {
 }
 
 .seat {
-  border:1px solid #555;
-  padding:7px;
-  background:#1a1a1a;
-  border-radius:6px;
+  border:1px solid #333;
+  padding:8px;
+  background:#161616;
+  border-radius:8px;
   font-size:10px;
+  position:relative;
+  transition:all 0.2s ease;
+}
+
+.seat.glow {
+  box-shadow:0 0 12px #B4FF00;
 }
 
 .seat h3 {
   margin:0 0 4px 0;
   font-size:12px;
 }
+
+/* Archetype Accent Borders */
+.aggro { border-left:4px solid #B4FF00; }
+.combo { border-left:4px solid #FFD700; }
+.control { border-left:4px solid #00BFFF; }
+.midrange { border-left:4px solid #CCCCCC; }
 
 .rank {
   font-weight:bold;
@@ -83,22 +83,15 @@ button {
 }
 
 .high { color:#B4FF00; }
-.medium { color:yellow; }
-.low { color:#888; }
-
-.controls label {
-  display:block;
-  font-size:9px;
-  margin-top:3px;
-  color:#aaa;
-}
+.medium { color:#FFD700; }
+.low { color:#777; }
 
 select, input {
   width:100%;
-  margin-top:1px;
-  background:#111;
+  margin-top:2px;
+  background:#0f0f0f;
   color:white;
-  border:1px solid #444;
+  border:1px solid #333;
   font-size:9px;
   padding:2px;
 }
@@ -116,30 +109,48 @@ select, input {
   color:#aaa;
 }
 
+/* Clock Indicator */
+.clock-ring {
+  position:absolute;
+  top:6px;
+  right:6px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  border:2px solid #444;
+}
+
+.clock-dev { border-color:#444; }
+.clock-trans { border-color:#B4FF00; }
+.clock-imm { border-color:#FFD700; }
+
 .sticky-compression {
   position:fixed;
   bottom:0;
   left:0;
   right:0;
   background:#111;
-  border-top:1px solid #555;
+  border-top:1px solid #333;
   padding:6px;
   text-align:center;
   font-size:11px;
-  z-index:1000;
 }
 
 .footer-note {
   text-align:center;
   font-size:9px;
   color:#666;
-  margin-top:8px;
+  margin-top:6px;
 }
 
-@media (max-width:768px){
-  .pod {
-    grid-template-columns: 1fr 1fr;
-  }
+button {
+  background:#B4FF00;
+  border:none;
+  padding:6px 12px;
+  margin:6px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:12px;
 }
 </style>
 </head>
@@ -157,9 +168,7 @@ select, input {
 
 <div class="dashboard" id="dashboard">
 <div class="pod" id="pod"></div>
-<div class="footer-note">
-Structural Ranking Based on Visible Inputs and Archetype Density.
-</div>
+<div class="footer-note">Structural Ranking Based on Visible Inputs.</div>
 </div>
 
 <div class="sticky-compression" id="compressionDisplay">
@@ -179,41 +188,35 @@ function startSimulation(){
 function generateSeats(){
   const pod = document.getElementById("pod");
   pod.innerHTML="";
-
-  // Clockwise layout order
   const layoutOrder = [0,1,3,2];
 
   for(let index=0; index<layoutOrder.length; index++){
     let i = layoutOrder[index];
 
     pod.innerHTML += `
-    <div class="seat">
+    <div class="seat" id="seat${i}">
+      <div class="clock-ring clock-dev" id="clockRing${i}"></div>
       <h3>Seat ${i+1}</h3>
 
-      <label>Archetype</label>
       <select id="arch${i}" onchange="update()">
         ${archetypes.map(a=>`<option>${a}</option>`).join("")}
       </select>
 
-      <label>Posture</label>
       <select id="posture${i}" onchange="update()">
         <option>Aligned</option>
         <option>Disrupted</option>
       </select>
 
-      <label>Clock</label>
       <select id="clock${i}" onchange="update()">
         <option>Developing</option>
         <option>Transitioning</option>
         <option>Imminent</option>
       </select>
 
-      <label>Mulligans</label>
       <select id="mull${i}" onchange="update()">
         <option>0</option><option>1</option><option>2</option><option>3</option>
       </select>
 
-      <label>Parity</label>
       <div class="parity-row"><span>Mana</span><input type="number" id="mana${i}" value="0" onchange="update()"></div>
       <div class="parity-row"><span>Cards</span><input type="number" id="cards${i}" value="0" onchange="update()"></div>
       <div class="parity-row"><span>Board</span><input type="number" id="board${i}" value="0" onchange="update()"></div>
@@ -251,6 +254,12 @@ function update(){
   let compressionMult = compressionLevel==="Low"?1:(compressionLevel==="Medium"?1.25:1.5);
 
   for(let i=0;i<4;i++){
+    let seat = document.getElementById(`seat${i}`);
+    seat.classList.remove("aggro","combo","control","midrange","glow");
+
+    let arch = document.getElementById(`arch${i}`).value;
+    seat.classList.add(arch.toLowerCase());
+
     let parity =
       (parseInt(document.getElementById(`mana${i}`).value||0)*3)+
       (parseInt(document.getElementById(`cards${i}`).value||0)*3)+
@@ -265,10 +274,16 @@ function update(){
       clock *=0.5;
     }
 
+    let ring = document.getElementById(`clockRing${i}`);
+    ring.className = "clock-ring";
+    if(clock===0) ring.classList.add("clock-dev");
+    if(clock===4) ring.classList.add("clock-trans");
+    if(clock>=8) ring.classList.add("clock-imm");
+
     let densityMod=0;
-    if(archCount.Aggro>=3 && document.getElementById(`arch${i}`).value==="Control") densityMod=-4;
-    if(archCount.Combo>=3 && document.getElementById(`arch${i}`).value==="Aggro") densityMod=-4;
-    if(archCount.Control>=3 && document.getElementById(`arch${i}`).value==="Combo") densityMod=-4;
+    if(archCount.Aggro>=3 && arch==="Control") densityMod=-4;
+    if(archCount.Combo>=3 && arch==="Aggro") densityMod=-4;
+    if(archCount.Control>=3 && arch==="Combo") densityMod=-4;
 
     let score = parity + densityMod + (clock*compressionMult);
     scores.push({seat:i,score});
@@ -277,10 +292,13 @@ function update(){
   scores.sort((a,b)=>b.score-a.score);
 
   for(let rank=0;rank<4;rank++){
-    let seat=scores[rank].seat;
+    let seatIndex=scores[rank].seat;
     let tier = rank===0?"high":(rank===3?"low":"medium");
-    document.getElementById(`rank${seat}`).innerHTML=
+    document.getElementById(`rank${seatIndex}`).innerHTML=
       `Rank: ${rank+1} <span class="${tier}">(${tier.toUpperCase()})</span>`;
+    if(rank===0){
+      document.getElementById(`seat${seatIndex}`).classList.add("glow");
+    }
   }
 }
 
