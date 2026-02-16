@@ -197,6 +197,48 @@ html, body {
 }
 </style>
 
+
+<style>
+/* --- Move Life to Top-Right of Seat --- */
+
+.seat {
+    display:flex;
+    flex-direction:column;
+    padding:8px;
+}
+
+.seat-body {
+    display:grid;
+    grid-template-columns:1fr 90px;
+    grid-template-rows:auto 1fr;
+    column-gap:8px;
+}
+
+.seat-right {
+    grid-column:2;
+    grid-row:1;
+    display:flex;
+    justify-content:flex-end;
+    align-items:flex-start;
+}
+
+.seat-right input[type="number"] {
+    font-size:42px;
+    width:80px;
+    text-align:right;
+    font-weight:bold;
+}
+
+.metric-stack {
+    grid-column:1;
+    grid-row:1 / span 2;
+}
+
+.rank {
+    margin-top:4px;
+}
+</style>
+
 </head>
 
 <body>
