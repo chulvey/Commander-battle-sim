@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-<title>Commander Threat Counter v1</title>
+<title>Commander Threat Counter v1.1</title>
 
 <style>
 body{
@@ -101,11 +101,46 @@ button{
   margin-left:2px;
   border-radius:6px;
 }
+
+.cmdBtn{
+  margin-top:4px;
+  font-size:11px;
+  padding:6px 0;
+  background:#223046;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.modalContent{
+  background:#1b2533;
+  padding:16px;
+  border-radius:12px;
+  width:90%;
+  max-width:350px;
+}
+
+.modalRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:8px 0;
+}
 </style>
 </head>
 
 <body>
 <div class="grid" id="grid"></div>
+
+<div class="modal" id="cmdModal">
+  <div class="modalContent" id="cmdContent"></div>
+</div>
 
 <script>
 const START = { life:40, cards:7, permanents:0, mana:0, poison:0 };
@@ -134,7 +169,6 @@ for(let i=0;i<4;i++){
 
 function computeThreat(){
 
-  // Averages
   let avgLife = players.reduce((a,p)=>a+p.life,0)/4;
   let avgCards = players.reduce((a,p)=>a+p.cards,0)/4;
   let avgMana = players.reduce((a,p)=>a+p.mana,0)/4;
@@ -167,6 +201,7 @@ function computeThreat(){
     let LD = p.life/40;
     let PD = (10-p.poison)/10;
     let CD = 1;
+
     for(let j=0;j<4;j++){
       if(j!==i){
         CD=Math.min(CD,(21-p.cmd[j])/21);
@@ -178,15 +213,12 @@ function computeThreat(){
 
     let base = alpha*URS + gamma*TCI;
 
-    // Minority factor
     let nT = archetypeCounts[p.archetype];
     let minorityFactor = 1 - 0.18*((3-nT)/3);
 
-    // Seat proactive
     let seatIndex=i;
     let seatMultiplier = 1 + 0.08*speedAxis[p.archetype]*((3-seatIndex)/3);
 
-    // Control info bonus
     let infoBonus=1;
     if(p.archetype==="Control"){
       infoBonus = 1 + 0.05*(seatIndex/3);
@@ -198,7 +230,6 @@ function computeThreat(){
   });
 
   let max=Math.max(...scores);
-
   let newThreat=scores.indexOf(max);
 
   if(lastThreat!==null){
@@ -216,7 +247,6 @@ function computeThreat(){
   });
 
   lastThreat=newThreat;
-
   players.forEach((p,i)=>p.isThreat=(i===newThreat));
 }
 
@@ -254,6 +284,8 @@ function render(){
       ${statRow(i,"Perm","permanents")}
       ${statRow(i,"Poison","poison")}
     </div>
+
+    <button class="cmdBtn" onclick="openCmd(${i})">Commander Damage</button>
     `;
 
     grid.appendChild(div);
@@ -269,6 +301,38 @@ function statRow(i,label,stat){
       <button class="smallBtn" onclick="statAdjust(${i},'${stat}',1)">+</button>
     </span>
   </div>`;
+}
+
+function openCmd(i){
+  let modal=document.getElementById("cmdModal");
+  let content=document.getElementById("cmdContent");
+  content.innerHTML="<h3>Commander Damage Taken</h3>";
+
+  players.forEach((p,j)=>{
+    if(j!==i){
+      content.innerHTML+=`
+      <div class="modalRow">
+        From Seat ${j+1}: ${players[i].cmd[j]}
+        <span>
+          <button class="smallBtn" onclick="cmdAdjust(${i},${j},-1)">-</button>
+          <button class="smallBtn" onclick="cmdAdjust(${i},${j},1)">+</button>
+        </span>
+      </div>`;
+    }
+  });
+
+  content.innerHTML+=`<button onclick="closeCmd()">Close</button>`;
+  modal.style.display="flex";
+}
+
+function closeCmd(){
+  document.getElementById("cmdModal").style.display="none";
+  render();
+}
+
+function cmdAdjust(i,j,val){
+  players[i].cmd[j]=Math.max(0,Math.min(21,players[i].cmd[j]+val));
+  openCmd(i);
 }
 
 function adjust(i,val){ players[i].life+=val; render(); }
