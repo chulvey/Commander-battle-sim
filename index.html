@@ -1,284 +1,283 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Commander Battle Simulation v1.5</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<title>Commander Threat Counter v1</title>
 
 <style>
-body {
+body{
   margin:0;
-  font-family: Arial, sans-serif;
-  background:#0e0e0e;
-  color:#ffffff;
-  padding-top:80px;
-  padding-bottom:45px;
-}
-
-header {
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  background:#111;
-  border-bottom:1px solid #555;
-  text-align:center;
-  padding:10px 0;
-  z-index:1000;
-}
-
-.logo {
-  font-size:18px;
-  font-weight:bold;
-  color:#B4FF00;
-}
-
-.banner {
-  margin-top:4px;
-  padding:4px;
-  border:1px solid #555;
-  color:#aaa;
-  font-size:11px;
-}
-
-button {
-  background:#B4FF00;
-  border:none;
-  padding:6px 12px;
-  margin:6px;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:12px;
-}
-
-.dashboard {
-  display:none;
-  padding:8px;
-}
-
-.pod {
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:8px;
-}
-
-.seat {
-  border:1px solid #555;
-  padding:7px;
-  background:#1a1a1a;
-  border-radius:6px;
-  font-size:10px;
-}
-
-.seat h3 {
-  margin:0 0 4px 0;
-  font-size:12px;
-}
-
-.rank {
-  font-weight:bold;
-  margin-top:4px;
-  font-size:11px;
-}
-
-.high { color:#B4FF00; }
-.medium { color:yellow; }
-.low { color:#888; }
-
-.controls label {
-  display:block;
-  font-size:9px;
-  margin-top:3px;
-  color:#aaa;
-}
-
-select, input {
-  width:100%;
-  margin-top:1px;
-  background:#111;
+  background:#0c1118;
+  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
   color:white;
-  border:1px solid #444;
-  font-size:9px;
-  padding:2px;
 }
 
-.parity-row {
+.grid{
   display:grid;
-  grid-template-columns: 1fr 45px;
-  gap:3px;
-  align-items:center;
-  margin-top:1px;
-}
-
-.parity-row span {
-  font-size:9px;
-  color:#aaa;
-}
-
-.sticky-compression {
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#111;
-  border-top:1px solid #555;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  height:100vh;
+  gap:6px;
   padding:6px;
+}
+
+.player{
+  background:#141c27;
+  border-radius:16px;
+  padding:8px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+  transition:all .2s ease;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.player.threat{
+  box-shadow:0 0 20px #baff2a88, 0 0 40px #ffe94a66;
+  border:2px solid #baff2a;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.name{
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+}
+
+select{
+  background:#1e293b;
+  border:none;
+  color:white;
+  padding:3px 5px;
+  border-radius:6px;
+  font-size:12px;
+}
+
+.life{
   text-align:center;
+  font-size:52px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.controls{
+  display:flex;
+  justify-content:space-between;
+}
+
+button{
+  flex:1;
+  margin:2px;
+  border:none;
+  border-radius:10px;
+  padding:8px 0;
+  font-size:18px;
+  font-weight:700;
+  background:#1f2a3a;
+  color:white;
+}
+
+.stats{
   font-size:11px;
-  z-index:1000;
 }
 
-.footer-note {
-  text-align:center;
-  font-size:9px;
-  color:#666;
-  margin-top:8px;
+.statRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-@media (max-width:768px){
-  .pod {
-    grid-template-columns: 1fr 1fr;
-  }
+.smallBtn{
+  font-size:12px;
+  padding:3px 6px;
+  margin-left:2px;
+  border-radius:6px;
 }
-
-/* Leader highlight */
-.seat.leader {
-    border-color:#9cff00;
-    box-shadow:0 0 14px rgba(156,255,0,0.55);
-}
-.rank small{
-    color:#aaa;
-    font-weight:normal;
-}
-
 </style>
 </head>
 
 <body>
-
-<header>
-  <div class="logo">YOUR BUSINESS LOGO</div>
-  <div class="banner">Advertising Banner Space</div>
-</header>
-
-<div style="text-align:center;">
-  <button onclick="startSimulation()">Begin Commander Battle Simulation</button>
-</div>
-
-<div class="dashboard" id="dashboard">
-<div class="pod" id="pod"></div>
-<div class="footer-note">
-Structural Ranking Based on Visible Inputs and Archetype Density.
-</div>
-</div>
-
-<div class="sticky-compression" id="compressionDisplay">
-Compression Level: Low
-</div>
-
+<div class="grid" id="grid"></div>
 
 <script>
-function clampInt(v, min){
-  const n = parseInt(v, 10);
-  if (Number.isNaN(n)) return min;
-  return Math.max(min, n);
+const START = { life:40, cards:7, permanents:0, mana:0, poison:0 };
+
+let players = [];
+let heat = [0,0,0,0];
+let lastThreat = null;
+
+function createPlayer(index){
+  return {
+    id:index,
+    name:"Seat "+(index+1),
+    archetype:"Aggro",
+    life:START.life,
+    cards:START.cards,
+    permanents:START.permanents,
+    mana:START.mana,
+    poison:START.poison,
+    cmd:[0,0,0,0]
+  };
 }
 
-function adjustLife(seat, amount){
-    const display = document.getElementById("lifeDisplay"+seat);
-    const hidden = document.getElementById("lifeHidden"+seat);
-    const current = clampInt(display.innerText, 0) + amount;
-    display.innerText = current;
-    hidden.value = current;
-    updateRanks();
+for(let i=0;i<4;i++){
+  players.push(createPlayer(i));
 }
 
-function manualEntry(seat){
-    const display = document.getElementById("lifeDisplay"+seat);
-    const hidden = document.getElementById("lifeHidden"+seat);
-    const value = prompt("Enter Life Total:", display.innerText);
-    if(value !== null && value.trim() !== "" && !isNaN(value)){
-        const v = clampInt(value, 0);
-        display.innerText = v;
-        hidden.value = v;
-        updateRanks();
+function computeThreat(){
+
+  // Averages
+  let avgLife = players.reduce((a,p)=>a+p.life,0)/4;
+  let avgCards = players.reduce((a,p)=>a+p.cards,0)/4;
+  let avgMana = players.reduce((a,p)=>a+p.mana,0)/4;
+  let avgPerm = players.reduce((a,p)=>a+p.permanents,0)/4;
+
+  const wL=0.20, wC=1.0, wM=1.3, wP=0.8;
+  const alpha=0.75, gamma=0.25;
+
+  const speedAxis = {
+    Aggro:1.0,
+    Combo:1.2,
+    Midrange:0.5,
+    Control:0.0
+  };
+
+  let archetypeCounts={Aggro:0,Combo:0,Midrange:0,Control:0};
+  players.forEach(p=>archetypeCounts[p.archetype]++);
+
+  let scores=[];
+
+  players.forEach((p,i)=>{
+
+    let dL = p.life-avgLife;
+    let dC = p.cards-avgCards;
+    let dM = p.mana-avgMana;
+    let dP = p.permanents-avgPerm;
+
+    let URS = wL*dL + wC*dC + wM*dM + wP*dP;
+
+    let LD = p.life/40;
+    let PD = (10-p.poison)/10;
+    let CD = 1;
+    for(let j=0;j<4;j++){
+      if(j!==i){
+        CD=Math.min(CD,(21-p.cmd[j])/21);
+      }
     }
-}
 
-function getSeatScore(seatEl){
-    // Metrics inputs appear in order: Mana, Cards, Board (Life hidden is separate)
-    const metricInputs = seatEl.querySelectorAll('.metrics .metric input[type="number"]');
-    const mana  = metricInputs[0] ? clampInt(metricInputs[0].value, 0) : 0;
-    const cards = metricInputs[1] ? clampInt(metricInputs[1].value, 0) : 0;
-    const board = metricInputs[2] ? clampInt(metricInputs[2].value, 0) : 0;
+    let ES = Math.min(LD,PD,CD);
+    let TCI = 1-ES;
 
-    const seat = seatEl.getAttribute('data-seat');
-    const lifeHidden = document.getElementById('lifeHidden'+seat);
-    const life = lifeHidden ? clampInt(lifeHidden.value, 0) : 40;
+    let base = alpha*URS + gamma*TCI;
 
-    // Equivalency: 3 life = 1 mana
-    const lifeScore = life / 3;
+    // Minority factor
+    let nT = archetypeCounts[p.archetype];
+    let minorityFactor = 1 - 0.18*((3-nT)/3);
 
-    return {
-      seat: parseInt(seat,10),
-      mana, cards, board, life,
-      score: mana + cards + board + lifeScore
-    };
-}
+    // Seat proactive
+    let seatIndex=i;
+    let seatMultiplier = 1 + 0.08*speedAxis[p.archetype]*((3-seatIndex)/3);
 
-function ordinal(n){
-  if (n === 1) return "1st";
-  if (n === 2) return "2nd";
-  if (n === 3) return "3rd";
-  return "4th";
-}
+    // Control info bonus
+    let infoBonus=1;
+    if(p.archetype==="Control"){
+      infoBonus = 1 + 0.05*(seatIndex/3);
+    }
 
-function updateRanks(){
-    const seats = Array.from(document.querySelectorAll('.seat'));
-    const data = seats.map(getSeatScore);
+    let score = base*minorityFactor*seatMultiplier*infoBonus*(1-heat[i]);
 
-    // sort by score desc, tie-break by higher life then higher cards then seat #
-    data.sort((a,b)=>{
-      if (b.score !== a.score) return b.score - a.score;
-      if (b.life !== a.life) return b.life - a.life;
-      if (b.cards !== a.cards) return b.cards - a.cards;
-      return a.seat - b.seat;
-    });
-
-    // Clear leader class
-    seats.forEach(s=>s.classList.remove('leader'));
-
-    data.forEach((d, idx)=>{
-      const rankEl = document.getElementById('rank'+d.seat);
-      if (rankEl){
-        rankEl.innerHTML = `Rank: <strong>${ordinal(idx+1)}</strong> <small>(Score ${d.score.toFixed(1)})</small>`;
-      }
-      if (idx === 0){
-        const seatEl = document.querySelector(`.seat[data-seat="${d.seat}"]`);
-        if (seatEl) seatEl.classList.add('leader');
-      }
-    });
-}
-
-function attachListeners(){
-  // Update on any metric changes
-  document.querySelectorAll('.metrics input[type="number"]').forEach(inp=>{
-    // hidden life will be updated via life badge; still listen just in case
-    inp.addEventListener('input', updateRanks);
-    inp.addEventListener('change', updateRanks);
-  });
-  // Also update when dropdowns change (keeps UI reactive for future scoring)
-  document.querySelectorAll('.inputs select').forEach(sel=>{
-    sel.addEventListener('change', updateRanks);
+    scores.push(score);
   });
 
-  updateRanks();
+  let max=Math.max(...scores);
+
+  let newThreat=scores.indexOf(max);
+
+  if(lastThreat!==null){
+    if(scores[newThreat] < scores[lastThreat]*1.08){
+      newThreat=lastThreat;
+    }
+  }
+
+  players.forEach((p,i)=>{
+    if(i===newThreat){
+      heat[i]=Math.min(.35,heat[i]+.03);
+    }else{
+      heat[i]=Math.max(0,heat[i]-.02);
+    }
+  });
+
+  lastThreat=newThreat;
+
+  players.forEach((p,i)=>p.isThreat=(i===newThreat));
 }
 
-document.addEventListener('DOMContentLoaded', attachListeners);
+function render(){
+  computeThreat();
+  const grid=document.getElementById("grid");
+  grid.innerHTML="";
+
+  players.forEach((p,i)=>{
+
+    let div=document.createElement("div");
+    div.className="player"+(p.isThreat?" threat":"");
+
+    div.innerHTML=`
+    <div class="header">
+      <div class="name" onclick="editName(${i})">${p.name}</div>
+      <select onchange="setArch(${i},this.value)">
+        <option ${p.archetype==="Aggro"?"selected":""}>Aggro</option>
+        <option ${p.archetype==="Combo"?"selected":""}>Combo</option>
+        <option ${p.archetype==="Midrange"?"selected":""}>Midrange</option>
+        <option ${p.archetype==="Control"?"selected":""}>Control</option>
+      </select>
+    </div>
+
+    <div class="life" onclick="setLife(${i})">${p.life}</div>
+
+    <div class="controls">
+      <button onclick="adjust(${i},-1)">-</button>
+      <button onclick="adjust(${i},1)">+</button>
+    </div>
+
+    <div class="stats">
+      ${statRow(i,"Cards","cards")}
+      ${statRow(i,"Mana","mana")}
+      ${statRow(i,"Perm","permanents")}
+      ${statRow(i,"Poison","poison")}
+    </div>
+    `;
+
+    grid.appendChild(div);
+  });
+}
+
+function statRow(i,label,stat){
+  return `
+  <div class="statRow">
+    ${label}: ${players[i][stat]}
+    <span>
+      <button class="smallBtn" onclick="statAdjust(${i},'${stat}',-1)">-</button>
+      <button class="smallBtn" onclick="statAdjust(${i},'${stat}',1)">+</button>
+    </span>
+  </div>`;
+}
+
+function adjust(i,val){ players[i].life+=val; render(); }
+function statAdjust(i,stat,val){ players[i][stat]=Math.max(0,players[i][stat]+val); render(); }
+function editName(i){ let n=prompt("Name:",players[i].name); if(n) players[i].name=n; render(); }
+function setLife(i){ let v=prompt("Life:",players[i].life); if(!isNaN(v)) players[i].life=parseInt(v); render(); }
+function setArch(i,val){ players[i].archetype=val; render(); }
+
+render();
 </script>
-
-
 </body>
 </html>
