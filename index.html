@@ -222,6 +222,47 @@ header {
 }
 </style>
 
+
+<style>
+/* ---- Seat Dimension Rebalance ---- */
+
+#tool {
+    padding: 6px !important;
+    gap: 6px !important;
+}
+
+.seat {
+    padding: 6px !important;
+    box-sizing: border-box;
+}
+
+/* Internal 2-column structure */
+.seat {
+    display: grid !important;
+    grid-template-columns: 1fr 90px;
+    grid-template-rows: auto 1fr auto;
+    column-gap: 6px;
+}
+
+/* Life column sizing */
+.seat input[type="number"] {
+    font-size: 38px !important;
+    width: 80px !important;
+}
+
+/* Reduce metric block vertical size */
+.seat select {
+    padding: 4px !important;
+    font-size: 0.9em !important;
+}
+
+/* Tighten parity stack */
+.metric-group div {
+    margin-bottom: 4px !important;
+}
+
+</style>
+
 </head>
 
 <body>
