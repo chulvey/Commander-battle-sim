@@ -2,394 +2,292 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Commander Battle Simulation v1.5</title>
-
+<title>Commander Battle Tool - Life Enhanced</title>
 <style>
 body {
-  margin:0;
-  font-family: Arial, sans-serif;
-  background:#0e0e0e;
-  color:#ffffff;
-  padding-top:80px;
-  padding-bottom:45px;
+    background:#000;
+    color:white;
+    font-family:Arial, sans-serif;
+    margin:0;
+    padding:0;
 }
 
-header {
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  background:#111;
-  border-bottom:1px solid #555;
-  text-align:center;
-  padding:10px 0;
-  z-index:1000;
+.header {
+    text-align:center;
+    padding:10px;
+    font-size:24px;
+    color:#9cff00;
 }
 
-.logo {
-  font-size:18px;
-  font-weight:bold;
-  color:#B4FF00;
-}
-
-.banner {
-  margin-top:4px;
-  padding:4px;
-  border:1px solid #555;
-  color:#aaa;
-  font-size:11px;
-}
-
-button {
-  background:#B4FF00;
-  border:none;
-  padding:6px 12px;
-  margin:6px;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:12px;
-}
-
-.dashboard {
-  display:none;
-  padding:8px;
-}
-
-.pod {
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:8px;
+.container {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    padding:10px;
 }
 
 .seat {
-  border:1px solid #555;
-  padding:7px;
-  background:#1a1a1a;
-  border-radius:6px;
-  font-size:10px;
+    position:relative;
+    border:1px solid #444;
+    border-radius:10px;
+    padding:10px;
+    background:#111;
 }
 
 .seat h3 {
-  margin:0 0 4px 0;
-  font-size:12px;
+    margin-top:0;
+}
+
+.inputs select {
+    width:100%;
+    margin-bottom:5px;
+    background:#000;
+    color:white;
+    border:1px solid #555;
+    border-radius:5px;
+    padding:4px;
+}
+
+.metrics {
+    margin-top:5px;
+}
+
+.metric {
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:4px;
+}
+
+.metric input {
+    width:50px;
+    background:#000;
+    color:white;
+    border:1px solid #555;
+    border-radius:4px;
+    text-align:center;
+}
+
+/* LIFE BADGE */
+.life-badge {
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:90px;
+    height:90px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background:#000;
+    border:2px solid #9cff00;
+    border-radius:10px;
+    box-shadow:0 0 10px #9cff00, 0 0 20px #9cff00 inset;
+}
+
+.life-value {
+    font-size:28px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.life-controls {
+    display:flex;
+    gap:5px;
+}
+
+.life-controls button {
+    width:30px;
+    height:25px;
+    background:#000;
+    color:#9cff00;
+    border:1px solid #9cff00;
+    border-radius:4px;
+    font-size:18px;
+    cursor:pointer;
 }
 
 .rank {
-  font-weight:bold;
-  margin-top:4px;
-  font-size:11px;
-}
-
-.high { color:#B4FF00; }
-.medium { color:yellow; }
-.low { color:#888; }
-
-.controls label {
-  display:block;
-  font-size:9px;
-  margin-top:3px;
-  color:#aaa;
-}
-
-select, input {
-  width:100%;
-  margin-top:1px;
-  background:#111;
-  color:white;
-  border:1px solid #444;
-  font-size:9px;
-  padding:2px;
-}
-
-.parity-row {
-  display:grid;
-  grid-template-columns: 1fr 45px;
-  gap:3px;
-  align-items:center;
-  margin-top:1px;
-}
-
-.parity-row span {
-  font-size:9px;
-  color:#aaa;
-}
-
-.sticky-compression {
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#111;
-  border-top:1px solid #555;
-  padding:6px;
-  text-align:center;
-  font-size:11px;
-  z-index:1000;
-}
-
-.footer-note {
-  text-align:center;
-  font-size:9px;
-  color:#666;
-  margin-top:8px;
-}
-
-@media (max-width:768px){
-  .pod {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-</style>
-
-<style>
-html, body {
-    height:100%;
-    margin:0;
-    overflow:hidden;
-}
-
-#main-content {
-    height:calc(100vh - 140px);
-}
-
-#tool {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    grid-template-rows:1fr 1fr;
-    gap:8px;
-    height:100%;
-    padding:8px;
-    box-sizing:border-box;
-}
-
-.seat {
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    padding:8px;
-    box-sizing:border-box;
-}
-
-.seat-body {
-    display:grid;
-    grid-template-columns:1fr 100px;
-    column-gap:8px;
-}
-
-.seat-right {
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    align-items:flex-end;
-}
-
-.seat-right input[type="number"]{
-    font-size:40px;
-    width:80px;
-    text-align:right;
+    margin-top:5px;
     font-weight:bold;
 }
-
-.rank {
-    margin-top:4px;
-}
 </style>
-
-
-<style>
-/* --- Move Life to Top-Right of Seat --- */
-
-.seat {
-    display:flex;
-    flex-direction:column;
-    padding:8px;
-}
-
-.seat-body {
-    display:grid;
-    grid-template-columns:1fr 90px;
-    grid-template-rows:auto 1fr;
-    column-gap:8px;
-}
-
-.seat-right {
-    grid-column:2;
-    grid-row:1;
-    display:flex;
-    justify-content:flex-end;
-    align-items:flex-start;
-}
-
-.seat-right input[type="number"] {
-    font-size:42px;
-    width:80px;
-    text-align:right;
-    font-weight:bold;
-}
-
-.metric-stack {
-    grid-column:1;
-    grid-row:1 / span 2;
-}
-
-.rank {
-    margin-top:4px;
-}
-</style>
-
 </head>
-
 <body>
 
-<header>
-  <div class="logo">YOUR BUSINESS LOGO</div>
-  <div class="banner">Advertising Banner Space</div>
-</header>
+<div class="header">Commander Battle Simulation</div>
 
+<div class="container">
 
-    <div class="hero" id="hero" style="height:100vh;background:url('dragon_bg.jpg') center/cover no-repeat;display:flex;align-items:flex-start;justify-content:center;padding-top:40px;">
-        <button style="padding:14px 26px;font-size:16px;font-weight:bold;background:transparent;color:#baff66;border:2px solid #baff66;border-radius:6px;cursor:pointer;box-shadow:0 0 10px rgba(186,255,102,0.4);" onclick="startSimulation()">Begin Commander Battle Simulation</button>
+<div class="seat">
+    <h3>Seat 1</h3>
+
+    <div class="life-badge">
+        <div class="life-value" onclick="manualEntry(1)" id="lifeDisplay1">40</div>
+        <div class="life-controls">
+            <button onclick="adjustLife(1, -1)">-</button>
+            <button onclick="adjustLife(1, 1)">+</button>
+        </div>
     </div>
-    <div style="text-align:center; display:none;" id="originalStart">
-    
-  <button onclick="startSimulation()">Begin Commander Battle Simulation</button>
+
+    <div class="inputs">
+        <select>
+            <option>Aggro</option>
+            <option>Control</option>
+            <option>Combo</option>
+            <option>Midrange</option>
+        </select>
+        <select>
+            <option>Aligned</option>
+            <option>Behind</option>
+            <option>Ahead</option>
+        </select>
+    </div>
+
+    <div class="metrics">
+        <div class="metric">Mana <input type="number" value="0"></div>
+        <div class="metric">Cards <input type="number" value="0"></div>
+        <div class="metric">Board <input type="number" value="0"></div>
+        <div class="metric" style="display:none;">
+            Life <input type="number" id="lifeHidden1" value="40">
+        </div>
+    </div>
+
+    <div class="rank">Rank: --</div>
 </div>
 
-<div class="dashboard" id="dashboard">
-<div class="pod" id="pod"></div>
-<div class="footer-note">
-Structural Ranking Based on Visible Inputs and Archetype Density.
-</div>
+<div class="seat">
+    <h3>Seat 2</h3>
+
+    <div class="life-badge">
+        <div class="life-value" onclick="manualEntry(2)" id="lifeDisplay2">40</div>
+        <div class="life-controls">
+            <button onclick="adjustLife(2, -1)">-</button>
+            <button onclick="adjustLife(2, 1)">+</button>
+        </div>
+    </div>
+
+    <div class="inputs">
+        <select>
+            <option>Aggro</option>
+            <option>Control</option>
+            <option>Combo</option>
+            <option>Midrange</option>
+        </select>
+        <select>
+            <option>Aligned</option>
+            <option>Behind</option>
+            <option>Ahead</option>
+        </select>
+    </div>
+
+    <div class="metrics">
+        <div class="metric">Mana <input type="number" value="0"></div>
+        <div class="metric">Cards <input type="number" value="0"></div>
+        <div class="metric">Board <input type="number" value="0"></div>
+        <div class="metric" style="display:none;">
+            Life <input type="number" id="lifeHidden2" value="40">
+        </div>
+    </div>
+
+    <div class="rank">Rank: --</div>
 </div>
 
-<div class="sticky-compression" id="compressionDisplay">
-Compression Level: Low
+<div class="seat">
+    <h3>Seat 3</h3>
+
+    <div class="life-badge">
+        <div class="life-value" onclick="manualEntry(3)" id="lifeDisplay3">40</div>
+        <div class="life-controls">
+            <button onclick="adjustLife(3, -1)">-</button>
+            <button onclick="adjustLife(3, 1)">+</button>
+        </div>
+    </div>
+
+    <div class="inputs">
+        <select>
+            <option>Aggro</option>
+            <option>Control</option>
+            <option>Combo</option>
+            <option>Midrange</option>
+        </select>
+        <select>
+            <option>Aligned</option>
+            <option>Behind</option>
+            <option>Ahead</option>
+        </select>
+    </div>
+
+    <div class="metrics">
+        <div class="metric">Mana <input type="number" value="0"></div>
+        <div class="metric">Cards <input type="number" value="0"></div>
+        <div class="metric">Board <input type="number" value="0"></div>
+        <div class="metric" style="display:none;">
+            Life <input type="number" id="lifeHidden3" value="40">
+        </div>
+    </div>
+
+    <div class="rank">Rank: --</div>
+</div>
+
+<div class="seat">
+    <h3>Seat 4</h3>
+
+    <div class="life-badge">
+        <div class="life-value" onclick="manualEntry(4)" id="lifeDisplay4">40</div>
+        <div class="life-controls">
+            <button onclick="adjustLife(4, -1)">-</button>
+            <button onclick="adjustLife(4, 1)">+</button>
+        </div>
+    </div>
+
+    <div class="inputs">
+        <select>
+            <option>Aggro</option>
+            <option>Control</option>
+            <option>Combo</option>
+            <option>Midrange</option>
+        </select>
+        <select>
+            <option>Aligned</option>
+            <option>Behind</option>
+            <option>Ahead</option>
+        </select>
+    </div>
+
+    <div class="metrics">
+        <div class="metric">Mana <input type="number" value="0"></div>
+        <div class="metric">Cards <input type="number" value="0"></div>
+        <div class="metric">Board <input type="number" value="0"></div>
+        <div class="metric" style="display:none;">
+            Life <input type="number" id="lifeHidden4" value="40">
+        </div>
+    </div>
+
+    <div class="rank">Rank: --</div>
+</div>
+
 </div>
 
 <script>
-
-const archetypes = ["Aggro","Combo","Control","Midrange"];
-const clockValues = {Developing:0, Transitioning:4, Imminent:8};
-
-
-    function startSimulation(){
-        document.getElementById("hero").style.display="none";
-        document.getElementById("originalStart").style.display="none";
-    
-  document.getElementById("dashboard").style.display="block";
-  generateSeats();
+function adjustLife(seat, amount){
+    let display = document.getElementById("lifeDisplay"+seat);
+    let hidden = document.getElementById("lifeHidden"+seat);
+    let current = parseInt(display.innerText);
+    current += amount;
+    display.innerText = current;
+    hidden.value = current;
 }
 
-function generateSeats(){
-  const pod = document.getElementById("pod");
-  pod.innerHTML="";
-
-  // Clockwise layout order
-  const layoutOrder = [0,1,3,2];
-
-  for(let index=0; index<layoutOrder.length; index++){
-    let i = layoutOrder[index];
-
-    pod.innerHTML += `
-    <div class="seat">
-      <h3>Seat ${i+1}</h3>
-
-      <label>Archetype</label>
-      <select id="arch${i}" onchange="update()">
-        ${archetypes.map(a=>`<option>${a}</option>`).join("")}
-      </select>
-
-      <label>Posture</label>
-      <select id="posture${i}" onchange="update()">
-        <option>Aligned</option>
-        <option>Disrupted</option>
-      </select>
-
-      <label>Clock</label>
-      <select id="clock${i}" onchange="update()">
-        <option>Developing</option>
-        <option>Transitioning</option>
-        <option>Imminent</option>
-      </select>
-
-      <label>Mulligans</label>
-      <select id="mull${i}" onchange="update()">
-        <option>0</option><option>1</option><option>2</option><option>3</option>
-      </select>
-
-      <label>Parity</label>
-      <div class="parity-row"><span>Mana</span><input type="number" id="mana${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Cards</span><input type="number" id="cards${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Board</span><input type="number" id="board${i}" value="0" onchange="update()"></div>
-      <div class="parity-row"><span>Life</span><input type="number" id="life${i}" value="40" onchange="update()"></div>
-
-      <div class="rank" id="rank${i}"></div>
-    </div>`;
-  }
-  update();
-}
-
-function update(){
-
-  let scores=[];
-  let archCount={Aggro:0,Combo:0,Control:0,Midrange:0};
-
-  for(let i=0;i<4;i++){
-    archCount[document.getElementById(`arch${i}`).value]++;
-  }
-
-  let compressionLevel="Low";
-  let imminentCount=0;
-  let transitioningCount=0;
-
-  for(let i=0;i<4;i++){
-    if(document.getElementById(`clock${i}`).value==="Imminent") imminentCount++;
-    if(document.getElementById(`clock${i}`).value==="Transitioning") transitioningCount++;
-  }
-
-  if(imminentCount>=1 || transitioningCount>=2) compressionLevel="Medium";
-  if(imminentCount>=2) compressionLevel="High";
-
-  document.getElementById("compressionDisplay").innerText="Compression Level: "+compressionLevel;
-
-  let compressionMult = compressionLevel==="Low"?1:(compressionLevel==="Medium"?1.25:1.5);
-
-  for(let i=0;i<4;i++){
-    let parity =
-      (parseInt(document.getElementById(`mana${i}`).value||0)*3)+
-      (parseInt(document.getElementById(`cards${i}`).value||0)*3)+
-      (parseInt(document.getElementById(`board${i}`).value||0)*2)+
-      ((parseInt(document.getElementById(`life${i}`).value||40)-40)*1);
-
-    let mullPenalty = [0,2,4,7][parseInt(document.getElementById(`mull${i}`).value)];
-    parity -= mullPenalty;
-
-    let clock = clockValues[document.getElementById(`clock${i}`).value];
-    if(document.getElementById(`posture${i}`).value==="Disrupted"){
-      clock *=0.5;
+function manualEntry(seat){
+    let display = document.getElementById("lifeDisplay"+seat);
+    let hidden = document.getElementById("lifeHidden"+seat);
+    let value = prompt("Enter Life Total:", display.innerText);
+    if(value !== null && !isNaN(value)){
+        display.innerText = value;
+        hidden.value = value;
     }
-
-    let densityMod=0;
-    if(archCount.Aggro>=3 && document.getElementById(`arch${i}`).value==="Control") densityMod=-4;
-    if(archCount.Combo>=3 && document.getElementById(`arch${i}`).value==="Aggro") densityMod=-4;
-    if(archCount.Control>=3 && document.getElementById(`arch${i}`).value==="Combo") densityMod=-4;
-
-    let score = parity + densityMod + (clock*compressionMult);
-    scores.push({seat:i,score});
-  }
-
-  scores.sort((a,b)=>b.score-a.score);
-
-  for(let rank=0;rank<4;rank++){
-    let seat=scores[rank].seat;
-    let tier = rank===0?"high":(rank===3?"low":"medium");
-    document.getElementById(`rank${seat}`).innerHTML=
-      `Rank: ${rank+1} <span class="${tier}">(${tier.toUpperCase()})</span>`;
-  }
 }
-
 </script>
 
 </body>
