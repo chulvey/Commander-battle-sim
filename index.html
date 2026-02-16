@@ -141,97 +141,84 @@ select, input {
     grid-template-columns: 1fr 1fr;
   }
 }
-
-/* Life prominence */
-.parity-row.life-row{
-  grid-template-columns: 1fr 90px;
-  margin-top:6px;
-}
-.parity-row.life-row span{
-  font-weight:700;
-}
-.parity-row.life-row input[id^="life"]{
-  width:90px;
-  font-size:48px;
-  font-weight:800;
-  text-align:right;
-  line-height:1;
-  padding:2px 6px;
-  height:52px;
-}
-
 </style>
 
 <style>
-/* --- Vertical Compression Adjustment --- */
-
-/* Reduce seat vertical footprint ~10% */
-.seat {
-    padding: 8px 10px !important;
-    margin-bottom: 8px !important;
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
 }
 
-.seat h3 {
-    margin: 4px 0 !important;
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
-.seat select,
-.seat input {
-    margin: 2px 0 !important;
+header {
+    flex: 0 0 auto;
 }
 
-/* Slightly reduce metric spacing */
-.metric-group {
-    gap: 4px !important;
+#compression-bar {
+    flex: 0 0 40px;
 }
 
-/* Reduce hero dragon image height 15% */
-.hero-image {
-    max-height: 70vh !important;
+#main-content {
+    flex: 1 1 auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#hero {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#hero img {
+    max-height: 85%;
+    max-width: 100%;
     object-fit: contain;
 }
 
-/* Reduce hero button spacing */
-.hero button {
-    margin-top: 10px !important;
+#hero button {
+    position: absolute;
+    top: 10%;
 }
-</style>
 
-
-<style>
-/* --- Additional Vertical Compression --- */
+#tool {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    padding: 8px;
+    box-sizing: border-box;
+}
 
 .seat {
-    padding: 6px 8px !important;
-    margin-bottom: 6px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 6px;
+    box-sizing: border-box;
 }
 
-.seat h3 {
-    margin: 2px 0 !important;
-    font-size: 0.95em !important;
+.seat input[type="number"] {
+    font-size: 42px;
+    font-weight: bold;
+    text-align: right;
+    width: 90px;
 }
 
-.seat select,
-.seat input {
-    margin: 1px 0 !important;
-}
-
-.metric-group {
-    gap: 2px !important;
-}
-
-input[type="number"] {
-    font-size: 42px !important; /* slightly reduced from 48 but still prominent */
-}
-
-.hero-image {
-    max-height: 60vh !important; /* further reduced */
-}
-
-.hero button {
-    margin-top: 6px !important;
-    padding: 10px !important;
-    font-size: 1em !important;
+.life-wrapper {
+    display: flex;
+    justify-content: flex-end;
 }
 </style>
 
@@ -319,7 +306,7 @@ function generateSeats(){
       <div class="parity-row"><span>Mana</span><input type="number" id="mana${i}" value="0" onchange="update()"></div>
       <div class="parity-row"><span>Cards</span><input type="number" id="cards${i}" value="0" onchange="update()"></div>
       <div class="parity-row"><span>Board</span><input type="number" id="board${i}" value="0" onchange="update()"></div>
-      <div class="parity-row life-row"><span>Life</span><input type="number" id="life${i}" value="40" onchange="update()"></div>
+      <div class="parity-row"><span>Life</span><input type="number" id="life${i}" value="40" onchange="update()"></div>
 
       <div class="rank" id="rank${i}"></div>
     </div>`;
