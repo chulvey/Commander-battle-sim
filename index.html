@@ -1,17 +1,29 @@
-
 <!doctype html>
 <html>
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-<title>Commander Threat Counter v1.2</title>
+<title>Commander Threat Counter v1.3</title>
 
 <style>
+:root{
+  --bg:#000;
+  --panel:#101820;
+  --panel2:#1b2533;
+  --btn:#1f2a3a;
+  --btn2:#223046;
+  --text:#fff;
+  --muted:rgba(255,255,255,.75);
+  --border:rgba(255,255,255,.08);
+  --threat:#baff2a;
+}
+
 body{
   margin:0;
-  background:#000000; /* Pure black background */
+  background:var(--bg);
   font-family:-apple-system, BlinkMacSystemFont, sans-serif;
-  color:white;
+  color:var(--text);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .top-section{
@@ -42,31 +54,45 @@ body{
 }
 
 .player{
-  background:#101820;
+  background:var(--panel);
   border-radius:12px;
   padding:6px;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
-  border:1px solid rgba(255,255,255,.08);
-  transition:all .2s ease;
+  border:1px solid var(--border);
+  transition:transform .2s ease, box-shadow .2s ease, border .2s ease;
+  position:relative;
+  overflow:hidden;
 }
 
 .player.threat{
   box-shadow:0 0 16px #baff2a88, 0 0 30px #ffe94a66;
-  border:2px solid #baff2a;
+  border:2px solid var(--threat);
+}
+
+.player.rotated{
+  transform: rotate(180deg);
 }
 
 .header{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:6px;
 }
 
 .name{
   font-weight:700;
   font-size:12px;
   cursor:pointer;
+  user-select:none;
+}
+
+.headerRight{
+  display:flex;
+  gap:6px;
+  align-items:center;
 }
 
 select{
@@ -78,11 +104,34 @@ select{
   font-size:10px;
 }
 
+.iconBtn{
+  width:28px;
+  flex:0 0 auto;
+  padding:6px 0;
+  font-size:14px;
+  line-height:14px;
+  border-radius:8px;
+  background:var(--btn);
+}
+
 .life{
   text-align:center;
   font-size:38px;
   font-weight:900;
+  user-select:none;
+}
+
+.tapToEditHint{
+  text-align:center;
+  font-size:9px;
+  color:rgba(255,255,255,.55);
+  margin-top:-4px;
+  user-select:none;
+}
+
+.valueTap{
   cursor:pointer;
+  user-select:none;
 }
 
 .controls{
@@ -98,8 +147,12 @@ button{
   padding:6px 0;
   font-size:14px;
   font-weight:700;
-  background:#1f2a3a;
-  color:white;
+  background:var(--btn);
+  color:var(--text);
+}
+
+button:active{
+  transform: scale(0.98);
 }
 
 .stats{
@@ -110,20 +163,27 @@ button{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:6px;
+  padding:1px 0;
+}
+
+.statLabel{
+  color:var(--muted);
 }
 
 .smallBtn{
   font-size:10px;
-  padding:2px 4px;
+  padding:2px 6px;
   margin-left:2px;
-  border-radius:4px;
+  border-radius:6px;
+  flex:0 0 auto;
 }
 
 .cmdBtn{
   margin-top:3px;
   font-size:10px;
-  padding:4px 0;
-  background:#223046;
+  padding:6px 0;
+  background:var(--btn2);
 }
 
 .modal{
@@ -133,21 +193,131 @@ button{
   display:none;
   align-items:center;
   justify-content:center;
+  z-index:1000;
 }
 
 .modalContent{
-  background:#1b2533;
+  background:var(--panel2);
   padding:14px;
   border-radius:12px;
-  width:90%;
-  max-width:350px;
+  width:92%;
+  max-width:380px;
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.modalTitle{
+  font-size:16px;
+  font-weight:800;
+  margin:0 0 8px 0;
 }
 
 .modalRow{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin:6px 0;
+  margin:8px 0;
+  gap:10px;
+}
+
+.modalRowLeft{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+}
+
+.modalRowLabel{
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.modalRowSub{
+  font-size:10px;
+  color:rgba(255,255,255,.65);
+}
+
+.modalRowRight{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.modalValue{
+  font-size:14px;
+  font-weight:900;
+  min-width:28px;
+  text-align:right;
+}
+
+.modalFooter{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+.modalFooter button{
+  padding:10px 0;
+}
+
+.input{
+  width:100%;
+  box-sizing:border-box;
+  background:#0f172a;
+  color:var(--text);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:16px;
+  outline:none;
+}
+
+.zoomBackdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  z-index:900;
+}
+
+.player.zoomed{
+  position:fixed;
+  inset:8px;
+  width:auto !important;
+  height:auto !important;
+  z-index:950;
+  border-radius:16px;
+  padding:12px;
+}
+
+.zoomControls{
+  display:none;
+  position:absolute;
+  top:8px;
+  right:8px;
+  gap:8px;
+}
+
+.player.zoomed .zoomControls{
+  display:flex;
+}
+
+.zoomControls button{
+  width:auto;
+  flex:0 0 auto;
+  padding:10px 12px;
+  font-size:14px;
+  border-radius:12px;
+}
+
+.zoomClose{
+  background:#2a1f1f;
+}
+
+.zoomRotate{
+  background:#1f2a3a;
 }
 </style>
 </head>
@@ -161,8 +331,16 @@ button{
 
 <div class="grid" id="grid"></div>
 
-<div class="modal" id="cmdModal">
+<div class="zoomBackdrop" id="zoomBackdrop" onclick="unzoom()"></div>
+
+<!-- Commander Damage Modal -->
+<div class="modal" id="cmdModal" onclick="modalBackdropClose(event, 'cmdModal')">
   <div class="modalContent" id="cmdContent"></div>
+</div>
+
+<!-- Generic Edit Modal (Name / Number) -->
+<div class="modal" id="editModal" onclick="modalBackdropClose(event, 'editModal')">
+  <div class="modalContent" id="editContent"></div>
 </div>
 
 <script>
@@ -171,6 +349,7 @@ const START = { life:40, cards:7, permanents:0, mana:0, poison:0 };
 let players = [];
 let heat = [0,0,0,0];
 let lastThreat = null;
+let zoomedIndex = null;
 
 function createPlayer(index){
   return {
@@ -182,14 +361,21 @@ function createPlayer(index){
     permanents:START.permanents,
     mana:START.mana,
     poison:START.poison,
-    cmd:[0,0,0,0]
+    // Commander damage taken by this player from each seat (including self for completeness)
+    cmd:[0,0,0,0],
+    rotated:false
   };
 }
 
 for(let i=0;i<4;i++){ players.push(createPlayer(i)); }
 
-function computeThreat(){
+function clampInt(v, min, max){
+  v = parseInt(v, 10);
+  if (Number.isNaN(v)) return min;
+  return Math.max(min, Math.min(max, v));
+}
 
+function computeThreat(){
   let avgLife = players.reduce((a,p)=>a+p.life,0)/4;
   let avgCards = players.reduce((a,p)=>a+p.cards,0)/4;
   let avgMana = players.reduce((a,p)=>a+p.mana,0)/4;
@@ -206,7 +392,6 @@ function computeThreat(){
   let scores=[];
 
   players.forEach((p,i)=>{
-
     let URS = wL*(p.life-avgLife)
             + wC*(p.cards-avgCards)
             + wM*(p.mana-avgMana)
@@ -215,6 +400,8 @@ function computeThreat(){
     let LD = p.life/40;
     let PD = (10-p.poison)/10;
     let CD = 1;
+
+    // Commander damage compression: the lowest remaining threshold among opponents
     for(let j=0;j<4;j++){
       if(j!==i){
         CD=Math.min(CD,(21-p.cmd[j])/21);
@@ -265,72 +452,139 @@ function render(){
   grid.innerHTML="";
 
   players.forEach((p,i)=>{
-
     let div=document.createElement("div");
-    div.className="player"+(p.isThreat?" threat":"");
+    div.className="player"+(p.isThreat?" threat":"")+(p.rotated?" rotated":"");
+    div.dataset.playerIndex = i;
+
+    // Click-to-zoom: only when tapping non-interactive space
+    div.addEventListener("click",(e)=>{
+      const interactive = e.target.closest("button, select, .name, .valueTap, input");
+      if(interactive) return;
+      zoomPlayer(i);
+    });
 
     div.innerHTML=`
-    <div class="header">
-      <div class="name" onclick="editName(${i})">${p.name}</div>
-      <select onchange="setArch(${i},this.value)">
-        <option ${p.archetype==="Aggro"?"selected":""}>Aggro</option>
-        <option ${p.archetype==="Combo"?"selected":""}>Combo</option>
-        <option ${p.archetype==="Midrange"?"selected":""}>Midrange</option>
-        <option ${p.archetype==="Control"?"selected":""}>Control</option>
-      </select>
-    </div>
+      <div class="zoomControls">
+        <button class="zoomRotate" onclick="toggleRotate(${i}); event.stopPropagation();">🔄 Rotate</button>
+        <button class="zoomClose" onclick="unzoom(); event.stopPropagation();">✕ Close</button>
+      </div>
 
-    <div class="life" onclick="setLife(${i})">${p.life}</div>
+      <div class="header">
+        <div class="name" onclick="editName(${i}); event.stopPropagation();">${escapeHtml(p.name)}</div>
+        <div class="headerRight">
+          <button class="iconBtn" title="Rotate player space" onclick="toggleRotate(${i}); event.stopPropagation();">🔄</button>
+          <select onchange="setArch(${i},this.value); event.stopPropagation();">
+            <option ${p.archetype==="Aggro"?"selected":""}>Aggro</option>
+            <option ${p.archetype==="Combo"?"selected":""}>Combo</option>
+            <option ${p.archetype==="Midrange"?"selected":""}>Midrange</option>
+            <option ${p.archetype==="Control"?"selected":""}>Control</option>
+          </select>
+        </div>
+      </div>
 
-    <div class="controls">
-      <button onclick="adjust(${i},-1)">-</button>
-      <button onclick="adjust(${i},1)">+</button>
-    </div>
+      <div class="life valueTap" onclick="editNumber(${i}, 'life', 'Life', 0, 999); event.stopPropagation();">${p.life}</div>
+      <div class="tapToEditHint">Tap number to set • Use +/- to adjust</div>
 
-    <div class="stats">
-      ${statRow(i,"Cards","cards")}
-      ${statRow(i,"Mana","mana")}
-      ${statRow(i,"Perm","permanents")}
-      ${statRow(i,"Poison","poison")}
-    </div>
+      <div class="controls">
+        <button onclick="adjust(${i},-1); event.stopPropagation();">-</button>
+        <button onclick="adjust(${i},1); event.stopPropagation();">+</button>
+      </div>
 
-    <button class="cmdBtn" onclick="openCmd(${i})">CMD</button>
+      <div class="stats">
+        ${statRow(i,"Cards","cards",0,999)}
+        ${statRow(i,"Mana","mana",0,999)}
+        ${statRow(i,"Perm","permanents",0,999)}
+        ${statRow(i,"Poison","poison",0,10)}
+      </div>
+
+      <button class="cmdBtn" onclick="openCmd(${i}); event.stopPropagation();">Commander Damage</button>
     `;
 
     grid.appendChild(div);
   });
+
+  // Re-apply zoomed class to the same element after re-render
+  if(zoomedIndex !== null){
+    const node = [...document.querySelectorAll(".player")].find(el => parseInt(el.dataset.playerIndex,10)===zoomedIndex);
+    if(node){
+      node.classList.add("zoomed");
+      document.getElementById("zoomBackdrop").style.display="block";
+    }else{
+      zoomedIndex = null;
+      document.getElementById("zoomBackdrop").style.display="none";
+    }
+  }
 }
 
-function statRow(i,label,stat){
+function statRow(i,label,stat,min,max){
   return `
-  <div class="statRow">
-    ${label}: ${players[i][stat]}
-    <span>
-      <button class="smallBtn" onclick="statAdjust(${i},'${stat}',-1)">-</button>
-      <button class="smallBtn" onclick="statAdjust(${i},'${stat}',1)">+</button>
-    </span>
-  </div>`;
+    <div class="statRow">
+      <div class="statLabel">${label}:</div>
+      <div class="valueTap" onclick="editNumber(${i}, '${stat}', '${label}', ${min}, ${max}); event.stopPropagation();">${players[i][stat]}</div>
+      <span>
+        <button class="smallBtn" onclick="statAdjust(${i},'${stat}',-1, ${min}, ${max}); event.stopPropagation();">-</button>
+        <button class="smallBtn" onclick="statAdjust(${i},'${stat}',1, ${min}, ${max}); event.stopPropagation();">+</button>
+      </span>
+    </div>
+  `;
+}
+
+function zoomPlayer(i){
+  zoomedIndex = i;
+  document.getElementById("zoomBackdrop").style.display="block";
+  render();
+}
+
+function unzoom(){
+  zoomedIndex = null;
+  document.getElementById("zoomBackdrop").style.display="none";
+  // Remove zoomed class from any lingering nodes
+  document.querySelectorAll(".player.zoomed").forEach(n=>n.classList.remove("zoomed"));
+}
+
+function toggleRotate(i){
+  players[i].rotated = !players[i].rotated;
+  render();
 }
 
 function openCmd(i){
   let modal=document.getElementById("cmdModal");
   let content=document.getElementById("cmdContent");
-  content.innerHTML="<h3>Commander Damage Taken</h3>";
 
-  players.forEach((p,j)=>{
-    if(j!==i){
-      content.innerHTML+=`
-      <div class="modalRow">
-        From Seat ${j+1}: ${players[i].cmd[j]}
-        <span>
-          <button class="smallBtn" onclick="cmdAdjust(${i},${j},-1)">-</button>
-          <button class="smallBtn" onclick="cmdAdjust(${i},${j},1)">+</button>
-        </span>
-      </div>`;
-    }
-  });
+  content.innerHTML = `
+    <div class="modalTitle">Commander Damage Taken</div>
+    <div style="font-size:11px; color:rgba(255,255,255,.65); margin-bottom:8px;">
+      Editing: <b>${escapeHtml(players[i].name)}</b>
+    </div>
+  `;
 
-  content.innerHTML+=`<button onclick="closeCmd()">Close</button>`;
+  // Show all 4 players (including self), labels auto-populate from name field.
+  for(let j=0;j<4;j++){
+    const isSelf = (j===i);
+    const label = players[j].name;
+    const value = players[i].cmd[j] || 0;
+
+    content.innerHTML += `
+      <div class="modalRow" style="${isSelf ? "opacity:.45;" : ""}">
+        <div class="modalRowLeft">
+          <div class="modalRowLabel">${escapeHtml(label)}</div>
+          <div class="modalRowSub">${isSelf ? "Self (disabled)" : "Damage from this commander"}</div>
+        </div>
+        <div class="modalRowRight">
+          <div class="modalValue valueTap" onclick="${isSelf ? "" : `editCmdValue(${i},${j});`} event.stopPropagation();">${value}</div>
+          <button class="smallBtn" ${isSelf ? "disabled" : ""} onclick="cmdAdjust(${i},${j},-1); event.stopPropagation();">-</button>
+          <button class="smallBtn" ${isSelf ? "disabled" : ""} onclick="cmdAdjust(${i},${j},1); event.stopPropagation();">+</button>
+        </div>
+      </div>
+    `;
+  }
+
+  content.innerHTML += `
+    <div class="modalFooter">
+      <button onclick="closeCmd()">Close</button>
+    </div>
+  `;
+
   modal.style.display="flex";
 }
 
@@ -340,12 +594,13 @@ function closeCmd(){
 }
 
 function cmdAdjust(i,j,val){
-  let newVal = Math.max(0,Math.min(21,players[i].cmd[j]+val));
-  let diff = newVal - players[i].cmd[j];
+  if(i===j) return; // self disabled
+  let newVal = clampInt((players[i].cmd[j]||0) + val, 0, 21);
+  let diff = newVal - (players[i].cmd[j]||0);
+  players[i].cmd[j] = newVal;
 
-  players[i].cmd[j]=newVal;
-
-  // Proportionally decrease life when commander damage increases
+  // Keep existing behavior: when commander damage increases, reduce life by same amount.
+  // Note: this is a convenience coupling; you can disable if you want commander damage tracked separately.
   if(diff > 0){
     players[i].life = Math.max(0, players[i].life - diff);
   }
@@ -353,11 +608,135 @@ function cmdAdjust(i,j,val){
   openCmd(i);
 }
 
-function adjust(i,val){ players[i].life+=val; render(); }
-function statAdjust(i,stat,val){ players[i][stat]=Math.max(0,players[i][stat]+val); render(); }
-function editName(i){ let n=prompt("Name:",players[i].name); if(n) players[i].name=n; render(); }
-function setLife(i){ let v=prompt("Life:",players[i].life); if(!isNaN(v)) players[i].life=parseInt(v); render(); }
-function setArch(i,val){ players[i].archetype=val; render(); }
+function editCmdValue(i,j){
+  openEditModal({
+    title: `Set Commander Damage`,
+    subtitle: `Target: <b>${escapeHtml(players[i].name)}</b><br/>Source: <b>${escapeHtml(players[j].name)}</b>`,
+    type: "number",
+    value: players[i].cmd[j] || 0,
+    min: 0,
+    max: 21,
+    onSave: (v)=>{
+      v = clampInt(v, 0, 21);
+      const diff = v - (players[i].cmd[j]||0);
+      players[i].cmd[j] = v;
+      if(diff > 0){
+        players[i].life = Math.max(0, players[i].life - diff);
+      }
+      openCmd(i);
+    }
+  });
+}
+
+function adjust(i,val){
+  players[i].life = Math.max(0, players[i].life + val);
+  render();
+}
+
+function statAdjust(i,stat,val,min,max){
+  players[i][stat] = clampInt(players[i][stat] + val, min, max);
+  render();
+}
+
+function editName(i){
+  openEditModal({
+    title: "Edit Player Name",
+    subtitle: "Updates commander-damage labels automatically.",
+    type: "text",
+    value: players[i].name,
+    onSave: (v)=>{
+      v = (v || "").trim();
+      if(v.length === 0) return;
+      players[i].name = v;
+      closeEdit();
+      render();
+    }
+  });
+}
+
+function editNumber(i, stat, label, min, max){
+  openEditModal({
+    title: `Set ${label}`,
+    subtitle: `Player: <b>${escapeHtml(players[i].name)}</b>`,
+    type: "number",
+    value: players[i][stat],
+    min,
+    max,
+    onSave: (v)=>{
+      players[i][stat] = clampInt(v, min, max);
+      closeEdit();
+      render();
+    }
+  });
+}
+
+function setArch(i,val){
+  players[i].archetype = val;
+  render();
+}
+
+function modalBackdropClose(e, id){
+  if(e.target && e.target.id === id){
+    document.getElementById(id).style.display="none";
+    if(id === "cmdModal") render();
+  }
+}
+
+function openEditModal({title, subtitle, type, value, min, max, onSave}){
+  const modal = document.getElementById("editModal");
+  const content = document.getElementById("editContent");
+
+  const isNumber = type === "number";
+  const inputAttrs = isNumber
+    ? `inputmode="numeric" pattern="[0-9]*" min="${min ?? 0}" max="${max ?? 999}"`
+    : `autocomplete="off"`;
+
+  content.innerHTML = `
+    <div class="modalTitle">${title}</div>
+    <div style="font-size:11px; color:rgba(255,255,255,.7); margin-bottom:10px;">${subtitle || ""}</div>
+    <input class="input" id="editInput" type="${type}" ${inputAttrs} value="${escapeAttr(String(value ?? ""))}" />
+    <div class="modalFooter">
+      <button onclick="saveEdit()">Save</button>
+      <button onclick="closeEdit()">Cancel</button>
+    </div>
+  `;
+
+  modal.style.display = "flex";
+
+  window.__editSave = onSave;
+  setTimeout(()=>{
+    const el = document.getElementById("editInput");
+    if(el){
+      el.focus();
+      if(!isNumber) el.select();
+    }
+  }, 30);
+}
+
+function saveEdit(){
+  const el = document.getElementById("editInput");
+  if(!el || !window.__editSave) return;
+  window.__editSave(el.value);
+}
+
+function closeEdit(){
+  document.getElementById("editModal").style.display="none";
+  window.__editSave = null;
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function escapeAttr(str){
+  // conservative: same as HTML escape
+  return escapeHtml(str);
+}
 
 render();
 </script>
