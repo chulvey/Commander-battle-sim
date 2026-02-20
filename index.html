@@ -180,15 +180,10 @@ button:active{
 }
 
 .cmdBtn{
-    
-  padding:4px 0;
-  font-size:11px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:8px;
-  height:26px;
-  line-height:18px;
+    padding:2px 0;
+  font-size:9px;
 margin-top:3px;
+  background:var(--btn2);
 }
 
 .modal{
@@ -324,6 +319,21 @@ margin-top:3px;
 .zoomRotate{
   background:#1f2a3a;
 }
+
+.cmdPill{
+  flex:0 0 auto;
+  margin-left:6px;
+  padding:2px 8px;
+  font-size:9px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#fff;
+}
+.cmdPill:active{
+  transform:scale(0.95);
+}
+
 </style>
 </head>
 
@@ -501,10 +511,21 @@ function render(){
         ${statRow(i,"Cards","cards",0,999)}
         ${statRow(i,"Mana","mana",0,999)}
         ${statRow(i,"Perm","permanents",0,999)}
-        ${statRow(i,"Poison","poison",0,10)}
+        
+    <div class="statRow">
+      <div class="statLabel">Poison:</div>
+      <div class="valueTap" onclick="editNumber(${i}, 'poison', 'Poison', 0, 10); event.stopPropagation();">${players[i].poison}</div>
+      <span>
+        <button class="smallBtn" onclick="statAdjust(${i},'poison',-1, 0, 10); event.stopPropagation();">-</button>
+        <button class="smallBtn" onclick="statAdjust(${i},'poison',1, 0, 10); event.stopPropagation();">+</button>
+      </span>
+      <button class="cmdPill" onclick="openCmd(${i}); event.stopPropagation();">⚔ CMD</button>
+    </div>
+    
       </div>
 
-      <button class="cmdBtn" onclick="openCmd(${i}); event.stopPropagation();">Commander Damage</button>
+      <!-- removed large cmdBtn in v1.5 -->
+<!--${i}); event.stopPropagation();">Commander Damage</button>-->
     `;
 
     grid.appendChild(div);
