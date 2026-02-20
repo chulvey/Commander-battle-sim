@@ -180,12 +180,9 @@ button:active{
 }
 
 .cmdBtn{
-  padding:2px 0;
+    padding:2px 0;
   font-size:9px;
-
-  margin-top:3px;
-  font-size:10px;
-  padding:6px 0;
+margin-top:3px;
   background:var(--btn2);
 }
 
@@ -330,7 +327,7 @@ button:active{
 <div class="top-section">
   <div class="logo">YOUR BUSINESS LOGO</div>
   <div class="ad-banner">
-  Advertising Banner Space • <span id="wakeStatus" style="margin-left:8px;">🔒 Awake: OFF</span>
+  Advertising Banner Space • <span id="wakeStatus" style="margin-left:8px; cursor:pointer;">🔒 Awake: OFF</span>
 </div>
 </div>
 
@@ -537,58 +534,7 @@ function statRow(i,label,stat,min,max){
 function zoomPlayer(i){
   zoomedIndex = i;
   document.getElementById("zoomBackdrop").style.display="block";
-  
-/* ===============================
-   SCREEN WAKE LOCK IMPLEMENTATION
-   =============================== */
-
-let wakeLock = null;
-let wakeEnabled = true;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator && wakeEnabled) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
-      wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-      });
-    }
-  } catch (err) {
-    console.log("Wake Lock Error:", err);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-  }
-}
-
-function toggleWakeLock() {
-  wakeEnabled = !wakeEnabled;
-  if (wakeEnabled) {
-    requestWakeLock();
-  } else {
-    releaseWakeLock();
-  }
-}
-
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && wakeEnabled) {
-    requestWakeLock();
-  }
-});
-
-document.addEventListener('click', () => {
-  if (!wakeLock && wakeEnabled) requestWakeLock();
-}, { once: true });
-
-render();
+  render();
 }
 
 function unzoom(){
@@ -600,58 +546,7 @@ function unzoom(){
 
 function toggleRotate(i){
   players[i].rotated = !players[i].rotated;
-  
-/* ===============================
-   SCREEN WAKE LOCK IMPLEMENTATION
-   =============================== */
-
-let wakeLock = null;
-let wakeEnabled = true;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator && wakeEnabled) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
-      wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-      });
-    }
-  } catch (err) {
-    console.log("Wake Lock Error:", err);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-  }
-}
-
-function toggleWakeLock() {
-  wakeEnabled = !wakeEnabled;
-  if (wakeEnabled) {
-    requestWakeLock();
-  } else {
-    releaseWakeLock();
-  }
-}
-
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && wakeEnabled) {
-    requestWakeLock();
-  }
-});
-
-document.addEventListener('click', () => {
-  if (!wakeLock && wakeEnabled) requestWakeLock();
-}, { once: true });
-
-render();
+  render();
 }
 
 function openCmd(i){
@@ -697,58 +592,7 @@ function openCmd(i){
 
 function closeCmd(){
   document.getElementById("cmdModal").style.display="none";
-  
-/* ===============================
-   SCREEN WAKE LOCK IMPLEMENTATION
-   =============================== */
-
-let wakeLock = null;
-let wakeEnabled = true;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator && wakeEnabled) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
-      wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-      });
-    }
-  } catch (err) {
-    console.log("Wake Lock Error:", err);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-  }
-}
-
-function toggleWakeLock() {
-  wakeEnabled = !wakeEnabled;
-  if (wakeEnabled) {
-    requestWakeLock();
-  } else {
-    releaseWakeLock();
-  }
-}
-
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && wakeEnabled) {
-    requestWakeLock();
-  }
-});
-
-document.addEventListener('click', () => {
-  if (!wakeLock && wakeEnabled) requestWakeLock();
-}, { once: true });
-
-render();
+  render();
 }
 
 function cmdAdjust(i,j,val){
@@ -788,114 +632,12 @@ function editCmdValue(i,j){
 
 function adjust(i,val){
   players[i].life = Math.max(0, players[i].life + val);
-  
-/* ===============================
-   SCREEN WAKE LOCK IMPLEMENTATION
-   =============================== */
-
-let wakeLock = null;
-let wakeEnabled = true;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator && wakeEnabled) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
-      wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-      });
-    }
-  } catch (err) {
-    console.log("Wake Lock Error:", err);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-  }
-}
-
-function toggleWakeLock() {
-  wakeEnabled = !wakeEnabled;
-  if (wakeEnabled) {
-    requestWakeLock();
-  } else {
-    releaseWakeLock();
-  }
-}
-
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && wakeEnabled) {
-    requestWakeLock();
-  }
-});
-
-document.addEventListener('click', () => {
-  if (!wakeLock && wakeEnabled) requestWakeLock();
-}, { once: true });
-
-render();
+  render();
 }
 
 function statAdjust(i,stat,val,min,max){
   players[i][stat] = clampInt(players[i][stat] + val, min, max);
-  
-/* ===============================
-   SCREEN WAKE LOCK IMPLEMENTATION
-   =============================== */
-
-let wakeLock = null;
-let wakeEnabled = true;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator && wakeEnabled) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
-      wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-      });
-    }
-  } catch (err) {
-    console.log("Wake Lock Error:", err);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-  }
-}
-
-function toggleWakeLock() {
-  wakeEnabled = !wakeEnabled;
-  if (wakeEnabled) {
-    requestWakeLock();
-  } else {
-    releaseWakeLock();
-  }
-}
-
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && wakeEnabled) {
-    requestWakeLock();
-  }
-});
-
-document.addEventListener('click', () => {
-  if (!wakeLock && wakeEnabled) requestWakeLock();
-}, { once: true });
-
-render();
+  render();
 }
 
 function editName(i){
@@ -909,58 +651,7 @@ function editName(i){
       if(v.length === 0) return;
       players[i].name = v;
       closeEdit();
-      
-/* ===============================
-   SCREEN WAKE LOCK IMPLEMENTATION
-   =============================== */
-
-let wakeLock = null;
-let wakeEnabled = true;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator && wakeEnabled) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
-      wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-      });
-    }
-  } catch (err) {
-    console.log("Wake Lock Error:", err);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-  }
-}
-
-function toggleWakeLock() {
-  wakeEnabled = !wakeEnabled;
-  if (wakeEnabled) {
-    requestWakeLock();
-  } else {
-    releaseWakeLock();
-  }
-}
-
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && wakeEnabled) {
-    requestWakeLock();
-  }
-});
-
-document.addEventListener('click', () => {
-  if (!wakeLock && wakeEnabled) requestWakeLock();
-}, { once: true });
-
-render();
+      render();
     }
   });
 }
@@ -976,173 +667,20 @@ function editNumber(i, stat, label, min, max){
     onSave: (v)=>{
       players[i][stat] = clampInt(v, min, max);
       closeEdit();
-      
-/* ===============================
-   SCREEN WAKE LOCK IMPLEMENTATION
-   =============================== */
-
-let wakeLock = null;
-let wakeEnabled = true;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator && wakeEnabled) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
-      wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-      });
-    }
-  } catch (err) {
-    console.log("Wake Lock Error:", err);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-  }
-}
-
-function toggleWakeLock() {
-  wakeEnabled = !wakeEnabled;
-  if (wakeEnabled) {
-    requestWakeLock();
-  } else {
-    releaseWakeLock();
-  }
-}
-
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && wakeEnabled) {
-    requestWakeLock();
-  }
-});
-
-document.addEventListener('click', () => {
-  if (!wakeLock && wakeEnabled) requestWakeLock();
-}, { once: true });
-
-render();
+      render();
     }
   });
 }
 
 function setArch(i,val){
   players[i].archetype = val;
-  
-/* ===============================
-   SCREEN WAKE LOCK IMPLEMENTATION
-   =============================== */
-
-let wakeLock = null;
-let wakeEnabled = true;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator && wakeEnabled) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
-      wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-      });
-    }
-  } catch (err) {
-    console.log("Wake Lock Error:", err);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-  }
-}
-
-function toggleWakeLock() {
-  wakeEnabled = !wakeEnabled;
-  if (wakeEnabled) {
-    requestWakeLock();
-  } else {
-    releaseWakeLock();
-  }
-}
-
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && wakeEnabled) {
-    requestWakeLock();
-  }
-});
-
-document.addEventListener('click', () => {
-  if (!wakeLock && wakeEnabled) requestWakeLock();
-}, { once: true });
-
-render();
+  render();
 }
 
 function modalBackdropClose(e, id){
   if(e.target && e.target.id === id){
     document.getElementById(id).style.display="none";
-    if(id === "cmdModal") 
-/* ===============================
-   SCREEN WAKE LOCK IMPLEMENTATION
-   =============================== */
-
-let wakeLock = null;
-let wakeEnabled = true;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator && wakeEnabled) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
-      wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-      });
-    }
-  } catch (err) {
-    console.log("Wake Lock Error:", err);
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
-  }
-}
-
-function toggleWakeLock() {
-  wakeEnabled = !wakeEnabled;
-  if (wakeEnabled) {
-    requestWakeLock();
-  } else {
-    releaseWakeLock();
-  }
-}
-
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && wakeEnabled) {
-    requestWakeLock();
-  }
-});
-
-document.addEventListener('click', () => {
-  if (!wakeLock && wakeEnabled) requestWakeLock();
-}, { once: true });
-
-render();
+    if(id === "cmdModal") render();
   }
 }
 
@@ -1202,7 +740,6 @@ function escapeAttr(str){
   return escapeHtml(str);
 }
 
-
 /* ===============================
    SCREEN WAKE LOCK IMPLEMENTATION
    =============================== */
@@ -1210,45 +747,70 @@ function escapeAttr(str){
 let wakeLock = null;
 let wakeEnabled = true;
 
+function setWakeStatus(text){
+  const el = document.getElementById("wakeStatus");
+  if(el) el.innerText = text;
+}
+
 async function requestWakeLock() {
   try {
     if ('wakeLock' in navigator && wakeEnabled) {
       wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById("wakeStatus").innerText = "🔒 Awake: ON";
+      setWakeStatus("🔒 Awake: ON");
       wakeLock.addEventListener('release', () => {
-        document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
+        setWakeStatus("🔒 Awake: OFF");
       });
+    } else {
+      // Unsupported (common on iOS Safari depending on version)
+      setWakeStatus("🔒 Awake: UNSUP");
     }
   } catch (err) {
     console.log("Wake Lock Error:", err);
+    setWakeStatus("🔒 Awake: OFF");
   }
 }
 
 async function releaseWakeLock() {
-  if (wakeLock !== null) {
-    await wakeLock.release();
-    wakeLock = null;
-    document.getElementById("wakeStatus").innerText = "🔒 Awake: OFF";
+  try {
+    if (wakeLock !== null) {
+      await wakeLock.release();
+      wakeLock = null;
+    }
+  } catch (err) {
+    console.log("Wake Lock Release Error:", err);
+  } finally {
+    setWakeStatus("🔒 Awake: OFF");
   }
 }
 
-function toggleWakeLock() {
+async function toggleWakeLock() {
   wakeEnabled = !wakeEnabled;
   if (wakeEnabled) {
-    requestWakeLock();
+    await requestWakeLock();
   } else {
-    releaseWakeLock();
+    await releaseWakeLock();
   }
 }
 
-document.getElementById("wakeStatus").addEventListener("click", toggleWakeLock);
+// Toggle by tapping the indicator
+document.addEventListener("DOMContentLoaded", () => {
+  const el = document.getElementById("wakeStatus");
+  if(el){
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleWakeLock();
+    });
+  }
+});
 
+// Reacquire when returning to the tab
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && wakeEnabled) {
     requestWakeLock();
   }
 });
 
+// Browsers typically require a user gesture to start
 document.addEventListener('click', () => {
   if (!wakeLock && wakeEnabled) requestWakeLock();
 }, { once: true });
