@@ -2,159 +2,144 @@
 <html>
 
 <head>
-<meta charset="UTF-8">
-<title>Polyhedron Judge Online</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
 
 body{
-font-family:Arial;
-margin:0;
-padding:0;
 background:#000814;
 color:white;
+font-family:Arial;
+margin:0;
+padding:40px;
 }
 
-/* judge tab */
-
-#judgeTab{
-position:fixed;
-right:0;
-top:40%;
-background:#9CFF00;
-padding:10px 14px;
-font-weight:bold;
-cursor:pointer;
-border-radius:6px 0 0 6px;
-z-index:9999;
-color:black;
+h1{
+font-size:48px;
+margin-bottom:10px;
 }
 
-/* panel */
-
-#judgePanel{
-position:fixed;
-right:-26%;
-top:0;
-width:25%;
-height:100%;
-background:#0b0f16;
-color:white;
-padding:20px;
-transition:right .3s;
-z-index:9998;
-}
-
-#judgePanel.open{
-right:0;
+#status{
+font-size:26px;
+margin-bottom:20px;
 }
 
 textarea{
 width:100%;
-height:90px;
-margin-top:10px;
-font-size:16px;
+height:120px;
+font-size:20px;
+padding:15px;
+border-radius:12px;
+border:none;
 }
 
 button{
-margin-top:10px;
-padding:10px;
-background:#9CFF00;
+margin-top:15px;
+margin-right:15px;
+padding:15px 30px;
+font-size:20px;
+background:#9EF01A;
 border:none;
-font-weight:bold;
-cursor:pointer;
-margin-right:5px;
+border-radius:6px;
 }
 
-#judgeResponse{
-margin-top:10px;
-min-height:40px;
+#answer{
+margin-top:25px;
+font-size:22px;
+line-height:1.4;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<h3>Polyhedron Judge Online</h3>
+<h1>Judge!</h1>
 
-<div id="judgeTab">JUDGE</div>
+<div id="status">checking server...</div>
 
-<div id="judgePanel">
-
-<h2>Judge!</h2>
-
-<div id="judgeStatus">judge online</div>
-
-<div id="judgeResponse"></div>
-
-<textarea id="judgeInput" placeholder="what seems to be the issue?"></textarea>
+<textarea id="question" placeholder="what seems to be the issue?"></textarea>
 
 <br>
 
 <button onclick="askJudge()">Ask</button>
-<button onclick="clearJudge()">Clear</button>
+<button onclick="clearBox()">Clear</button>
 
-</div>
+<div id="answer"></div>
 
 <script>
 
-const judgeTab=document.getElementById("judgeTab")
-const judgePanel=document.getElementById("judgePanel")
+const status = document.getElementById("status")
+const answer = document.getElementById("answer")
 
-judgeTab.onclick=()=>{
-judgePanel.classList.toggle("open")
-}
+const SERVER =
+"https://polyhedron-judge.onrender.com"
 
-document.addEventListener("click",e=>{
-if(!judgePanel.contains(e.target)&&e.target!==judgeTab){
-judgePanel.classList.remove("open")
-}
-})
-
-async function askJudge(){
-
-const question=document.getElementById("judgeInput").value
-
-document.getElementById("judgeResponse").innerText="thinking..."
+async function checkServer(){
 
 try{
 
-const res=await fetch(
-"https://polyhedron-judge.onrender.com/ask",
+const res = await fetch(SERVER)
+
+if(res.ok){
+status.innerText = "judge online"
+}else{
+status.innerText = "judge offline"
+}
+
+}catch{
+status.innerText = "judge offline"
+}
+
+}
+
+async function askJudge(){
+
+const q =
+document.getElementById("question").value
+
+if(!q){
+return
+}
+
+status.innerText = "judge thinking..."
+
+try{
+
+const res = await fetch(
+SERVER + "/ask",
 {
 method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({question:question})
+body:JSON.stringify({question:q})
 }
 )
 
-if(!res.ok){
-throw new Error("server error")
-}
+const data = await res.json()
 
-const data=await res.json()
+answer.innerText = data.answer
 
-document.getElementById("judgeResponse").innerText=data.answer
+status.innerText = "judge online"
 
-}catch(err){
+}catch(e){
 
-document.getElementById("judgeStatus").innerText="judge offline"
-document.getElementById("judgeResponse").innerText="server unreachable"
+status.innerText = "judge offline"
+answer.innerText = "server unreachable"
 
 }
 
 }
 
-function clearJudge(){
+function clearBox(){
 
-document.getElementById("judgeInput").value=""
-document.getElementById("judgeResponse").innerText=""
+document.getElementById("question").value=""
+answer.innerText=""
 
 }
+
+checkServer()
 
 </script>
 
