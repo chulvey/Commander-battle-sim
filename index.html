@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 <meta charset="UTF-8">
 <title>Polyhedron Judge Online</title>
 
 <style>
 
-body {
-font-family: Arial;
+body{
+font-family:Arial;
 margin:0;
 padding:0;
+background:#000814;
+color:white;
 }
 
 /* judge tab */
@@ -24,6 +27,7 @@ font-weight:bold;
 cursor:pointer;
 border-radius:6px 0 0 6px;
 z-index:9999;
+color:black;
 }
 
 /* panel */
@@ -47,8 +51,9 @@ right:0;
 
 textarea{
 width:100%;
-height:80px;
+height:90px;
 margin-top:10px;
+font-size:16px;
 }
 
 button{
@@ -58,6 +63,12 @@ background:#9CFF00;
 border:none;
 font-weight:bold;
 cursor:pointer;
+margin-right:5px;
+}
+
+#judgeResponse{
+margin-top:10px;
+min-height:40px;
 }
 
 </style>
@@ -74,7 +85,9 @@ cursor:pointer;
 
 <h2>Judge!</h2>
 
-<div id="judgeResponse">judge online</div>
+<div id="judgeStatus">judge online</div>
+
+<div id="judgeResponse"></div>
 
 <textarea id="judgeInput" placeholder="what seems to be the issue?"></textarea>
 
@@ -87,22 +100,24 @@ cursor:pointer;
 
 <script>
 
-const judgeTab=document.getElementById("judgeTab");
-const judgePanel=document.getElementById("judgePanel");
+const judgeTab=document.getElementById("judgeTab")
+const judgePanel=document.getElementById("judgePanel")
 
 judgeTab.onclick=()=>{
-judgePanel.classList.toggle("open");
-};
+judgePanel.classList.toggle("open")
+}
 
 document.addEventListener("click",e=>{
-if(!judgePanel.contains(e.target) && e.target!==judgeTab){
-judgePanel.classList.remove("open");
+if(!judgePanel.contains(e.target)&&e.target!==judgeTab){
+judgePanel.classList.remove("open")
 }
-});
+})
 
 async function askJudge(){
 
-const question=document.getElementById("judgeInput").value;
+const question=document.getElementById("judgeInput").value
+
+document.getElementById("judgeResponse").innerText="thinking..."
 
 try{
 
@@ -113,30 +128,36 @@ method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({question})
+body:JSON.stringify({question:question})
 }
-);
+)
 
-const data=await res.json();
-
-document.getElementById("judgeResponse").innerText=
-data.answer || "No response";
-
+if(!res.ok){
+throw new Error("server error")
 }
-catch(err){
 
-document.getElementById("judgeResponse").innerText="judge offline";
+const data=await res.json()
+
+document.getElementById("judgeResponse").innerText=data.answer
+
+}catch(err){
+
+document.getElementById("judgeStatus").innerText="judge offline"
+document.getElementById("judgeResponse").innerText="server unreachable"
 
 }
 
 }
 
 function clearJudge(){
-document.getElementById("judgeInput").value="";
-document.getElementById("judgeResponse").innerText="";
+
+document.getElementById("judgeInput").value=""
+document.getElementById("judgeResponse").innerText=""
+
 }
 
 </script>
 
 </body>
+
 </html>
