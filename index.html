@@ -74,7 +74,7 @@ cursor:pointer;
 
 <h2>Judge!</h2>
 
-<div id="judgeResponse"></div>
+<div id="judgeResponse">judge online</div>
 
 <textarea id="judgeInput" placeholder="what seems to be the issue?"></textarea>
 
@@ -104,8 +104,10 @@ async function askJudge(){
 
 const question=document.getElementById("judgeInput").value;
 
+try{
+
 const res=await fetch(
-"https://polyhedron-judge.onrender.com/judge",
+"https://polyhedron-judge.onrender.com/ask",
 {
 method:"POST",
 headers:{
@@ -118,7 +120,14 @@ body:JSON.stringify({question})
 const data=await res.json();
 
 document.getElementById("judgeResponse").innerText=
-data.answer || data.message || "judge offline";
+data.answer || "No response";
+
+}
+catch(err){
+
+document.getElementById("judgeResponse").innerText="judge offline";
+
+}
 
 }
 
