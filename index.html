@@ -827,6 +827,7 @@ margin-right:5px;
 
 
 <script>
+(function(){
 
 const judgeTab=document.getElementById("judgeTab")
 const judgePanel=document.getElementById("judgePanel")
@@ -867,13 +868,14 @@ document.getElementById("judgeResponse").innerText="server unreachable"
 
 }
 
-function clearJudge(){
+window.askJudge=askJudge
 
+window.clearJudge=function(){
 document.getElementById("judgeInput").value=""
 document.getElementById("judgeResponse").innerText=""
-
 }
 
+})();
 </script>
 </body>
 </html>
