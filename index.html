@@ -1,11 +1,15 @@
 <!doctype html>
 <html>
+
 <head>
+
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-<title>Commander Threat Counter v1.3</title>
+
+<title>Commander Threat Counter</title>
 
 <style>
+
 :root{
   --bg:#000;
   --panel:#101820;
@@ -27,8 +31,8 @@ body{
 }
 
 /* ===============================
-   ORIGINAL SIMULATOR STYLES
-   =============================== */
+   HEADER
+=============================== */
 
 .top-section{
   text-align:center;
@@ -47,6 +51,10 @@ body{
   padding:6px;
   border-radius:6px;
 }
+
+/* ===============================
+   GRID
+=============================== */
 
 .grid{
   display:grid;
@@ -67,40 +75,59 @@ body{
   border:1px solid var(--border);
 }
 
+.life{
+  text-align:center;
+  font-size:38px;
+  font-weight:900;
+}
+
+button{
+  border:none;
+  border-radius:8px;
+  padding:6px 0;
+  font-size:14px;
+  font-weight:700;
+  background:var(--btn);
+  color:var(--text);
+}
+
 /* ===============================
    JUDGE OVERLAY
-   =============================== */
+=============================== */
 
 #judgeTab{
 position:fixed;
 right:0;
-top:40%;
+top:45%;
 background:#9CFF00;
-padding:10px 14px;
+padding:12px 16px;
 font-weight:bold;
 cursor:pointer;
-border-radius:6px 0 0 6px;
-z-index:9999;
+border-radius:8px 0 0 8px;
+z-index:10000;
 color:black;
-text-align:center;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:4px;
 }
 
 #judgeTabIcon{
-font-size:18px;
-line-height:18px;
+font-size:20px;
 }
 
 #judgePanel{
 position:fixed;
-right:-26%;
+right:-360px;
 top:0;
-width:25%;
+width:340px;
 height:100%;
 background:#0b0f16;
 color:white;
 padding:20px;
 transition:right .3s;
-z-index:9998;
+z-index:9999;
+box-shadow:-6px 0 20px rgba(0,0,0,.6);
 }
 
 #judgePanel.open{
@@ -125,6 +152,7 @@ margin-right:5px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -139,61 +167,75 @@ margin-right:5px;
 <script>
 
 /* ===============================
-   ORIGINAL SIMULATOR SCRIPT
-   =============================== */
+   BATTLE SIMULATOR
+=============================== */
 
-const START = { life:40, cards:7, permanents:0, mana:0, poison:0 };
+const START = { life:40 }
 
-let players = [];
+let players=[]
 
 function createPlayer(index){
-  return {
-    id:index,
-    name:"Seat "+(index+1),
-    life:START.life
-  };
+
+return{
+id:index,
+name:"Seat "+(index+1),
+life:START.life
+}
+
 }
 
 for(let i=0;i<4;i++){
-players.push(createPlayer(i));
+
+players.push(createPlayer(i))
+
 }
 
 function render(){
 
-const grid=document.getElementById("grid");
-grid.innerHTML="";
+const grid=document.getElementById("grid")
+
+grid.innerHTML=""
 
 players.forEach((p,i)=>{
 
-let div=document.createElement("div");
+let div=document.createElement("div")
 
-div.className="player";
+div.className="player"
 
 div.innerHTML=`
+
 <div>${p.name}</div>
-<div style="font-size:40px;text-align:center">${p.life}</div>
+
+<div class="life">${p.life}</div>
+
 <button onclick="players[${i}].life--;render()">-</button>
+
 <button onclick="players[${i}].life++;render()">+</button>
-`;
 
-grid.appendChild(div);
+`
 
-});
+grid.appendChild(div)
+
+})
 
 }
 
-render();
+render()
 
 </script>
 
 <!-- ===============================
-     JUDGE OVERLAY HTML
-     =============================== -->
+POLYHEDRON JUDGE
+=============================== -->
 
 <div id="judgeTab">
+
 <div id="judgeTabIcon">💬</div>
+
 <div>JUDGE</div>
+
 </div>
+
 
 <div id="judgePanel">
 
@@ -208,28 +250,25 @@ render();
 <br>
 
 <button class="judgeBtn" onclick="askJudge()">Ask</button>
+
 <button class="judgeBtn" onclick="clearJudge()">Clear</button>
 
 </div>
 
+
 <script>
 
-/* ===============================
-   JUDGE SCRIPT
-   =============================== */
+(function(){
 
 const judgeTab=document.getElementById("judgeTab")
+
 const judgePanel=document.getElementById("judgePanel")
 
-judgeTab.onclick=()=>{
-judgePanel.classList.toggle("open")
-}
+judgeTab.onclick=function(){
 
-document.addEventListener("click",e=>{
-if(!judgePanel.contains(e.target)&&e.target!==judgeTab){
-judgePanel.classList.remove("open")
+judgePanel.classList.toggle("open")
+
 }
-})
 
 async function askJudge(){
 
@@ -240,39 +279,52 @@ document.getElementById("judgeResponse").innerText="thinking..."
 try{
 
 const res=await fetch(
-"https://polyhedron-judge.onrender.com/judge",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({question:question})
-}
-)
 
-if(!res.ok){
-throw new Error("server error")
+"https://polyhedron-judge.onrender.com/judge",
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({question:question})
+
 }
+
+)
 
 const data=await res.json()
 
 document.getElementById("judgeResponse").innerText=data.answer
 
-}catch(err){
+}
+
+catch(err){
 
 document.getElementById("judgeStatus").innerText="judge offline"
+
 document.getElementById("judgeResponse").innerText="server unreachable"
 
 }
 
 }
 
-function clearJudge(){
+window.askJudge=askJudge
+
+window.clearJudge=function(){
 
 document.getElementById("judgeInput").value=""
+
 document.getElementById("judgeResponse").innerText=""
 
 }
+
+})();
 
 </script>
 
