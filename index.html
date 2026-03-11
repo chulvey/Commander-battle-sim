@@ -740,5 +740,140 @@ function escapeAttr(str){
 
 render();
 </script>
+  <!-- POLYHEDRON JUDGE OVERLAY -->
+
+<style>
+
+#judgeTab{
+position:fixed;
+right:0;
+top:45%;
+background:#9CFF00;
+padding:12px 16px;
+font-weight:bold;
+cursor:pointer;
+border-radius:8px 0 0 8px;
+z-index:9999;
+color:black;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:4px;
+}
+
+#judgeTabIcon{
+font-size:20px;
+}
+
+#judgePanel{
+position:fixed;
+right:-340px;
+top:0;
+width:320px;
+height:100%;
+background:#0b0f16;
+color:white;
+padding:20px;
+transition:right .3s;
+z-index:9998;
+}
+
+#judgePanel.open{
+right:0;
+}
+
+#judgeInput{
+width:100%;
+height:90px;
+margin-top:10px;
+font-size:16px;
+}
+
+.judgeBtn{
+margin-top:10px;
+padding:10px;
+background:#9CFF00;
+border:none;
+font-weight:bold;
+cursor:pointer;
+margin-right:5px;
+}
+
+</style>
+
+
+<div id="judgeTab">
+<div id="judgeTabIcon">💬</div>
+<div>JUDGE</div>
+</div>
+
+
+<div id="judgePanel">
+
+<h2>Judge</h2>
+
+<div id="judgeStatus">judge online</div>
+
+<div id="judgeResponse"></div>
+
+<textarea id="judgeInput" placeholder="what seems to be the issue?"></textarea>
+
+<br>
+
+<button class="judgeBtn" onclick="askJudge()">Ask</button>
+<button class="judgeBtn" onclick="clearJudge()">Clear</button>
+
+</div>
+
+
+<script>
+
+const judgeTab=document.getElementById("judgeTab")
+const judgePanel=document.getElementById("judgePanel")
+
+judgeTab.onclick=()=>{
+judgePanel.classList.toggle("open")
+}
+
+async function askJudge(){
+
+const question=document.getElementById("judgeInput").value
+
+document.getElementById("judgeResponse").innerText="thinking..."
+
+try{
+
+const res=await fetch(
+"https://polyhedron-judge.onrender.com/judge",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({question:question})
+}
+)
+
+const data=await res.json()
+
+document.getElementById("judgeResponse").innerText=data.answer
+
+}catch(err){
+
+document.getElementById("judgeStatus").innerText="judge offline"
+document.getElementById("judgeResponse").innerText="server unreachable"
+
+}
+
+}
+
+function clearJudge(){
+
+document.getElementById("judgeInput").value=""
+document.getElementById("judgeResponse").innerText=""
+
+}
+
+</script>
 </body>
 </html>
